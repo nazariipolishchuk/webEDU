@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Блокова розмітка — ЛР №1</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<!-- Макет а): 2 - бічна панель ліворуч, праворуч 1 - шапка, 4 - основний блок, 3 - підвал -->
+<div class="layout">
+    <aside class="side">2. Бічна панель</aside>
+
+    <div class="column">
+        <header class="head">1. Шапка сторінки</header>
+
+        <main class="main">
+            <h1>4. Основний блок</h1>
+
+            <ul>
+                <li>HTML — мова розмітки документа</li>
+                <li>CSS — мова опису стилів</li>
+                <li>Адаптивність — медіазапити</li>
+            </ul>
+
+            <div class="text">
+                <p>Сторінку побудовано <b>блоковою розміткою</b>: контейнер
+                    <span class="tag">div</span> з властивістю
+                    <span class="tag">display: flex</span> розташовує бічну панель
+                    та праву колонку в один рядок.</p>
+
+                <p><i>Адаптивність</i> забезпечує медіазапит: за ширини екрана
+                    до 600 пікселів блоки шикуються один під одним.</p>
+            </div>
+        </main>
+
+        <footer class="foot">3. Підвал сторінки</footer>
+    </div>
+</div>
+</body>
+</html>

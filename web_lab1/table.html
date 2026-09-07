@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Таблична розмітка — ЛР №1</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<!-- Той самий макет а), але побудований таблицею: -->
+<!-- бічна панель займає три рядки (rowspan="3"), праворуч - шапка, основний блок, підвал -->
+<table class="layout-table">
+    <tr>
+        <td class="side" rowspan="3">2. Бічна панель</td>
+        <td class="head">1. Шапка сторінки</td>
+    </tr>
+    <tr>
+        <td class="main">
+            <h1>4. Основний блок</h1>
+
+            <ul>
+                <li>HTML — мова розмітки документа</li>
+                <li>CSS — мова опису стилів</li>
+                <li>Адаптивність — медіазапити</li>
+            </ul>
+
+            <div class="text">
+                <p>Цю сторінку побудовано <b>табличною розміткою</b>: комірка
+                    бічної панелі об'єднує три рядки атрибутом
+                    <span class="tag">rowspan="3"</span>.</p>
+
+                <p><i>Недолік</i> такого підходу — таблиця описує структуру
+                    оформлення, а не зміст документа, тому її складніше зробити
+                    адаптивною.</p>
+            </div>
+        </td>
+    </tr>
+    <tr>
+        <td class="foot">3. Підвал сторінки</td>
+    </tr>
+</table>
+</body>
+</html>
