@@ -1,4 +1,4 @@
-/* Спільні стилі для блокової (index.html) та табличної (table.html) розмітки */
+/* Спільні стилі для п'яти блокових макетів (layout-a…layout-e) і табличного (table.html) */
 
 body {
     margin: 0;
@@ -7,7 +7,42 @@ body {
     background: #eef1f5;
 }
 
-/* ---------- 1. Шапка ---------- */
+/* ================= Каркас: усі п'ять макетів зібрано з трьох класів ================= */
+
+.layout {
+    display: flex;
+    min-height: calc(100vh - 20px);   /* макет займає всю висоту вікна */
+}
+
+.col {
+    display: flex;
+    flex-direction: column;  /* дочірні блоки один під одним */
+    flex: 1;
+}
+
+.row {
+    display: flex;           /* дочірні блоки в один рядок */
+    flex: 1;
+}
+
+.col > .main {
+    flex: 1;                 /* у колонці основний блок розтягується на всю висоту */
+}
+
+.row > .main {
+    flex: 1;                 /* у рядку основний блок забирає всю вільну ширину */
+    min-width: 0;            /* без цього довгий текст розсуває рядок за межі екрана */
+}
+
+.row > .extra {
+    width: 180px;            /* у рядку додатковий блок — вузька колонка */
+}
+
+.short {
+    align-self: flex-start;  /* блок не розтягується на всю висоту рядка */
+}
+
+/* ================= 1. Шапка ================= */
 .head {
     background: #1e6fd9;
     color: #fff;
@@ -20,7 +55,21 @@ body {
     background: #0d4ea3;
 }
 
-/* ---------- 2. Бічна панель ---------- */
+/* логотип усередині шапки (макет д) */
+.logo {
+    display: inline-block;
+    background: #fff;
+    color: #1e6fd9;
+    padding: 4px 14px;
+    font-size: 14px;
+}
+
+.logo:hover {
+    background: #ffd233;
+    color: #333;
+}
+
+/* ================= 2. Бічна панель ================= */
 .side {
     background: #f0b400;
     color: #333;
@@ -34,7 +83,7 @@ body {
     font-weight: bold;
 }
 
-/* ---------- 3. Підвал ---------- */
+/* ================= 3. Підвал ================= */
 .foot {
     background: #1e6fd9;
     color: #fff;
@@ -47,7 +96,7 @@ body {
     letter-spacing: 2px;
 }
 
-/* ---------- 4. Основний блок ---------- */
+/* ================= 4. Основний блок ================= */
 .main {
     background: #fff;
     padding: 20px;
@@ -68,26 +117,28 @@ body {
     font-family: "Courier New", monospace;
 }
 
-/* ---------- Блокова розмітка ---------- */
-.layout {
-    display: flex;
-    min-height: 95vh;    /* макет займає всю висоту вікна */
+/* ================= 5. Додатковий блок ================= */
+.extra {
+    background: #ffd970;
+    color: #333;
+    padding: 15px;
+    text-align: center;
 }
 
-.column {
-    flex: 1;             /* права колонка займає всю решту ширини */
-    display: flex;
-    flex-direction: column;
+.extra:hover {
+    background: #f0b400;
+    font-style: italic;
 }
 
-.column .main {
-    flex: 1;             /* основний блок розтягується на всю висоту колонки */
+/* ================= Головна сторінка зі списком макетів ================= */
+.menu li {
+    margin-bottom: 6px;
 }
 
-/* ---------- Таблична розмітка ---------- */
+/* ================= Таблична розмітка (table.html) ================= */
 .layout-table {
     width: 100%;
-    height: 95vh;
+    height: calc(100vh - 20px);
     border-collapse: collapse;
 }
 
@@ -95,20 +146,22 @@ body {
     vertical-align: top;
 }
 
-/* ---------- Адаптивність ---------- */
+/* ================= Адаптивність ================= */
 @media (max-width: 600px) {
-    .layout {
-        display: block;      /* блоки шикуються один під одним */
+    .layout,
+    .row {
+        display: block;          /* блоки шикуються один під одним */
     }
 
-    .side {
+    .side,
+    .row > .extra {
         width: auto;
     }
 
     .layout-table,
     .layout-table tr,
     .layout-table td {
-        display: block;      /* таблиця перестає бути таблицею */
+        display: block;          /* таблиця перестає бути таблицею */
         width: auto;
     }
 }

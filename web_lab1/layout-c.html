@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Макет в) — блокова розмітка</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<!-- Макет в): дві бічні колонки, основний блок посередині; додатковий блок 5 ліворуч -->
+<div class="layout col">
+    <header class="head">1. Шапка сторінки</header>
+
+    <div class="row">
+        <div class="extra">5. Додатковий блок</div>
+
+        <main class="main">
+            <h1>4. Основний блок</h1>
+
+            <ul>
+                <li>HTML — мова розмітки документа</li>
+                <li>CSS — мова опису стилів</li>
+                <li>Адаптивність — медіазапити</li>
+            </ul>
+
+            <div class="text">
+                <p>Макет <b>в)</b> — «трьохколонковий»: рядок
+                    <span class="tag">.row</span> містить три блоки, з яких
+                    крайні мають фіксовану ширину, а середній забирає решту
+                    завдяки <span class="tag">flex: 1</span>.</p>
+
+                <p>Порядок блоків у рядку задано <i>лише розміткою</i> — CSS для
+                    цього макета не змінювався.</p>
+            </div>
+        </main>
+
+        <aside class="side">2. Бічна панель</aside>
+    </div>
+
+    <footer class="foot">3. Підвал сторінки</footer>
+</div>
+</body>
+</html>

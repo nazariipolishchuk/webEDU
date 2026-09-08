@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Макет г) — блокова розмітка</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<!-- Макет г): те саме, що в), але бічна панель 2 ліворуч, а додатковий блок 5 праворуч -->
+<div class="layout col">
+    <header class="head">1. Шапка сторінки</header>
+
+    <div class="row">
+        <aside class="side">2. Бічна панель</aside>
+
+        <main class="main">
+            <h1>4. Основний блок</h1>
+
+            <ul>
+                <li>HTML — мова розмітки документа</li>
+                <li>CSS — мова опису стилів</li>
+                <li>Адаптивність — медіазапити</li>
+            </ul>
+
+            <div class="text">
+                <p>Макет <b>г)</b> відрізняється від попереднього лише
+                    <b>порядком</b> блоків у розмітці: бічна панель стоїть перед
+                    основним блоком, а додатковий — після нього.</p>
+
+                <p>Це показує головну перевагу блокової верстки: щоб <i>переставити
+                    колонки місцями</i>, достатньо змінити порядок тегів або
+                    задати їм <span class="tag">order</span>, не чіпаючи решту стилів.</p>
+            </div>
+        </main>
+
+        <div class="extra">5. Додатковий блок</div>
+    </div>
+
+    <footer class="foot">3. Підвал сторінки</footer>
+</div>
+</body>
+</html>

@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Макет б) — блокова розмітка</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<!-- Макет б): шапка 1 і підвал 3 на всю ширину, між ними рядок: панель 2 та колонка 5-4 -->
+<div class="layout col">
+    <header class="head">1. Шапка сторінки</header>
+
+    <div class="row">
+        <aside class="side">2. Бічна панель</aside>
+
+        <div class="col">
+            <div class="extra">5. Додатковий блок</div>
+
+            <main class="main">
+                <h1>4. Основний блок</h1>
+
+                <ul>
+                    <li>HTML — мова розмітки документа</li>
+                    <li>CSS — мова опису стилів</li>
+                    <li>Адаптивність — медіазапити</li>
+                </ul>
+
+                <div class="text">
+                    <p>Макет <b>б)</b> має три рівні вкладення: колонка
+                        <span class="tag">.layout.col</span> тримає шапку, рядок
+                        і підвал, а всередині рядка — панель та ще одна колонка.</p>
+
+                    <p>Додатковий блок лежить у <i>колонці</i>, а не в рядку,
+                        тому розтягується на всю її ширину й виглядає як смуга
+                        над основним блоком.</p>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <footer class="foot">3. Підвал сторінки</footer>
+</div>
+</body>
+</html>

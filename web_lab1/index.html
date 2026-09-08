@@ -3,39 +3,35 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Блокова розмітка — ЛР №1</title>
+    <title>Лабораторна робота №1 — макети сторінок</title>
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-<!-- Макет а): 2 - бічна панель ліворуч, праворуч 1 - шапка, 4 - основний блок, 3 - підвал -->
-<div class="layout">
-    <aside class="side">2. Бічна панель</aside>
+<div class="layout col">
+    <header class="head">Лабораторна робота №1 — п'ять макетів сторінки</header>
 
-    <div class="column">
-        <header class="head">1. Шапка сторінки</header>
+    <main class="main">
+        <h1>Блокова розмітка</h1>
 
-        <main class="main">
-            <h1>4. Основний блок</h1>
+        <ul class="menu">
+            <li><a href="layout-a.html">а) бічна панель на всю висоту ліворуч</a></li>
+            <li><a href="layout-b.html">б) панель під шапкою і смуга над основним блоком</a></li>
+            <li><a href="layout-c.html">в) три колонки, додатковий блок ліворуч</a></li>
+            <li><a href="layout-d.html">г) три колонки, бічна панель ліворуч</a></li>
+            <li><a href="layout-e.html">д) логотип у шапці, правий блок не на всю висоту</a></li>
+        </ul>
 
-            <ul>
-                <li>HTML — мова розмітки документа</li>
-                <li>CSS — мова опису стилів</li>
-                <li>Адаптивність — медіазапити</li>
-            </ul>
+        <div class="text">
+            <p>Усі п'ять макетів побудовано <b>однаковим способом</b> — блоками
+                <span class="tag">div</span> з властивістю
+                <span class="tag">display: flex</span> і спільною таблицею стилів.</p>
 
-            <div class="text">
-                <p>Сторінку побудовано <b>блоковою розміткою</b>: контейнер
-                    <span class="tag">div</span> з властивістю
-                    <span class="tag">display: flex</span> розташовує бічну панель
-                    та праву колонку в один рядок.</p>
+            <p>Для порівняння <i>того самого</i> макета а), зібраного другим
+                способом: <a href="table.html">таблична розмітка</a>.</p>
+        </div>
+    </main>
 
-                <p><i>Адаптивність</i> забезпечує медіазапит: за ширини екрана
-                    до 600 пікселів блоки шикуються один під одним.</p>
-            </div>
-        </main>
-
-        <footer class="foot">3. Підвал сторінки</footer>
-    </div>
+    <footer class="foot">Поліщук Н. М., група ПЗ-2404</footer>
 </div>
 </body>
 </html>

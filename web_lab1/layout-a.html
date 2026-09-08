@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Макет а) — блокова розмітка</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<!-- Макет а): бічна панель 2 на всю висоту ліворуч, праворуч колонка 1-4-3 -->
+<div class="layout">
+    <aside class="side">2. Бічна панель</aside>
+
+    <div class="col">
+        <header class="head">1. Шапка сторінки</header>
+
+        <main class="main">
+            <h1>4. Основний блок</h1>
+
+            <ul>
+                <li>HTML — мова розмітки документа</li>
+                <li>CSS — мова опису стилів</li>
+                <li>Адаптивність — медіазапити</li>
+            </ul>
+
+            <div class="text">
+                <p>Макет <b>а)</b> зібрано з двох частин: контейнер
+                    <span class="tag">.layout</span> з властивістю
+                    <span class="tag">display: flex</span> ставить бічну панель
+                    і праву колонку в один рядок.</p>
+
+                <p>Бічна панель — <i>прямий</i> нащадок контейнера, тому вона
+                    займає всю висоту сторінки, а шапка й підвал лишаються
+                    всередині правої колонки.</p>
+            </div>
+        </main>
+
+        <footer class="foot">3. Підвал сторінки</footer>
+    </div>
+</div>
+</body>
+</html>
