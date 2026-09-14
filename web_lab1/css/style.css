@@ -16,6 +16,12 @@ body {
     margin: 0;
     font-family: Arial, sans-serif;
     background: #fff;
+    overflow: hidden !important;
+    height: 100% !important;
+    width: 100% !important;
+    position: fixed !important;
+    touch-action: none;
+    -webkit-overflow-scrolling: auto;
 }
 
 /* ================= Каркас: усі п'ять макетів зібрано з трьох класів ================= */
