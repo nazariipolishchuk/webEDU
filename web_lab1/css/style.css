@@ -1,43 +1,40 @@
 /* Спільні стилі для п'яти блокових макетів (layout-a…layout-e) і табличного (table.html) */
 
 * {
-    box-sizing: border-box;      /* padding і рамка не збільшують задану ширину блока */
+    box-sizing: border-box;      /* поля і рамка не збільшують задану блоку ширину */
 }
 
 :root {
-    --gap: 10px;                 /* один відступ на весь проєкт: і між блоками, і від краю вікна */
+    --pad: 12%;                  /* поле сторінки — лише в тих макетах, де воно є на рисунку */
+    --bar: #1e6fd9;              /* колір шапки й підвалу */
+    --bar-text: #fff;
+    --panel: #f0b400;            /* колір бічних панелей */
+    --panel-text: #333;
 }
 
 body {
     margin: 0;
     font-family: Arial, sans-serif;
-    background: #eef1f5;
+    background: #fff;
 }
 
 /* ================= Каркас: усі п'ять макетів зібрано з трьох класів ================= */
 
 .layout {
     display: flex;
-    gap: var(--gap);             /* однакові проміжки між сусідніми блоками */
-    padding: var(--gap);         /* така сама рамка від краю вікна */
-    min-height: 100vh;
+    min-height: 100vh;           /* макет займає всю висоту вікна */
 }
 
 .col {
     display: flex;
     flex-direction: column;      /* дочірні блоки один під одним */
-    gap: var(--gap);
     flex: 1;
 }
 
 .row {
     display: flex;               /* дочірні блоки в один рядок */
-    gap: var(--gap);
     flex: 1;
 }
-
-/* вкладені .col і .row мають лише gap і не мають власного padding,
-   тому відступ між блоками однаковий на будь-якій глибині вкладення */
 
 .col > .main {
     flex: 1;                     /* у колонці основний блок розтягується на всю висоту */
@@ -52,8 +49,33 @@ body {
     width: 180px;                /* у рядку додатковий блок — вузька колонка */
 }
 
-.short {
-    align-self: flex-start;      /* блок не розтягується на всю висоту рядка */
+/* Блоки стоять упритул один до одного. Поле сторінки додається лише там,
+   де воно є на рисунку із завдання */
+
+.pad-r {
+    padding-right: var(--pad);   /* макет а) — поле тільки праворуч */
+}
+
+.pad-x {
+    padding: 0 var(--pad);       /* макети б) і г) — поля ліворуч і праворуч */
+}
+
+/* макет д): блоки лежать не впритул, а у внутрішньому контейнері з полями */
+.content {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    gap: 10px;
+    padding: 10px;
+    min-width: 0;
+}
+
+.content > .row {
+    gap: 10px;                   /* такий самий проміжок між блоками 3 і 4 */
+}
+
+.content > .row > .extra {
+    width: 40%;                  /* у макеті д) правий блок значно ширший */
 }
 
 /* ================= Кожен блок реагує на курсор по-своєму ================= */
@@ -63,6 +85,7 @@ body {
 .foot,
 .main,
 .extra,
+.note,
 .logo,
 .main li {
     transition: all 0.25s ease;  /* плавний перехід для всіх ефектів наведення */
@@ -70,64 +93,64 @@ body {
 
 /* ================= 1. Шапка ================= */
 .head {
-    background: #1e6fd9;
-    color: #fff;
+    background: var(--bar);
+    color: var(--bar-text);
     padding: 15px;
     text-align: center;
     font-size: 20px;
 }
 
 .head:hover {
-    background: #0d4ea3;
-    text-shadow: 0 2px 6px rgba(0, 0, 0, 0.45);   /* ефект: тінь під текстом */
+    filter: brightness(0.88);                     /* ефект: темніший фон */
+    text-shadow: 0 2px 6px rgba(0, 0, 0, 0.45);   /* і тінь під текстом */
 }
 
 /* логотип усередині шапки (макет д) */
 .logo {
     display: inline-block;
     background: #fff;
-    color: #1e6fd9;
+    color: #333;
     padding: 4px 14px;
     font-size: 14px;
 }
 
 .logo:hover {
-    background: #ffd233;
-    color: #333;
     transform: rotate(-5deg) scale(1.12);         /* ефект: поворот і збільшення */
+    box-shadow: 0 5px 12px rgba(0, 0, 0, 0.35);
 }
 
 /* ================= 2. Бічна панель ================= */
 .side {
-    background: #f0b400;
-    color: #333;
+    background: var(--panel);
+    color: var(--panel-text);
     padding: 15px;
     width: 180px;
     text-align: center;
 }
 
 .side:hover {
-    background: #ffd233;
+    filter: brightness(1.12);                     /* ефект: світліший фон */
     font-weight: bold;
-    box-shadow: inset 6px 0 0 #1e6fd9;            /* ефект: кольорова смуга всередині ліворуч */
+    box-shadow: inset 6px 0 0 var(--bar);         /* і кольорова смуга всередині ліворуч */
 }
 
 /* ================= 3. Підвал ================= */
 .foot {
-    background: #1e6fd9;
-    color: #fff;
+    background: var(--bar);
+    color: var(--bar-text);
     padding: 12px;
     text-align: center;
 }
 
 .foot:hover {
-    background: #0d4ea3;
+    filter: brightness(0.88);
     letter-spacing: 3px;                          /* ефект: розріджений текст */
 }
 
 /* ================= 4. Основний блок ================= */
 .main {
     background: #fff;
+    border: 1px solid #c8cdd4;
     padding: 20px;
 }
 
@@ -138,7 +161,7 @@ body {
 
 .main h1 {
     margin-top: 0;
-    color: #1e6fd9;
+    color: #1e6fd9;              /* синій незалежно від теми макета — інакше жовтий на білому не читається */
 }
 
 .main li:hover {
@@ -154,16 +177,36 @@ body {
 
 /* ================= 5. Додатковий блок ================= */
 .extra {
-    background: #ffd970;
-    color: #333;
+    background: var(--panel);
+    color: var(--panel-text);
     padding: 15px;
     text-align: center;
 }
 
 .extra:hover {
-    background: #f0b400;
+    filter: brightness(1.12);
     font-style: italic;
     transform: scale(1.05);                       /* ефект: блок збільшується */
+}
+
+/* ================= Вкладений блок макета д) ================= */
+.note {
+    background: #e03131;
+    color: #fff;
+    padding: 12px;
+    text-align: center;
+}
+
+.note:hover {
+    box-shadow: 0 0 0 5px #ffc9c9;                /* ефект: світле кільце навколо блока */
+}
+
+/* у макеті д) кольори шапки й панелей помінялися місцями */
+.alt {
+    --bar: #f0b400;
+    --bar-text: #333;
+    --panel: #1e6fd9;
+    --panel-text: #fff;
 }
 
 /* ================= Головна сторінка зі списком макетів ================= */
@@ -173,10 +216,9 @@ body {
 
 /* ================= Таблична розмітка (table.html) ================= */
 .layout-table {
-    width: 100%;
+    width: 88%;                  /* решта ширини — поле праворуч, як у макеті а) */
     height: 100vh;
-    border-collapse: separate;
-    border-spacing: var(--gap);   /* ті самі проміжки: і між комірками, і від краю вікна */
+    border-collapse: collapse;   /* комірки стоять упритул */
 }
 
 .layout-table td {
@@ -187,32 +229,25 @@ body {
 @media (max-width: 600px) {
     .layout,
     .row {
-        flex-direction: column;  /* блоки шикуються один під одним, проміжки лишаються ті самі */
+        flex-direction: column;  /* блоки шикуються один під одним */
+    }
+
+    .pad-r,
+    .pad-x {
+        padding: 0;              /* на вузькому екрані поля сторінки лише заважають */
     }
 
     .side,
-    .row > .extra {
+    .row > .extra,
+    .content > .row > .extra {
         width: auto;
     }
 
-    .short {
-        align-self: stretch;
-    }
-
-    .layout-table {
-        display: flex;           /* таблиця перестає бути таблицею */
-        flex-direction: column;
-        gap: var(--gap);
-        padding: var(--gap);
-        height: auto;
-    }
-
-    .layout-table tr {
-        display: contents;       /* рядок зникає, комірки стають прямими дітьми таблиці */
-    }
-
+    .layout-table,
+    .layout-table tr,
     .layout-table td {
-        display: block;
+        display: block;          /* таблиця перестає бути таблицею */
         width: auto;
+        height: auto;
     }
 }

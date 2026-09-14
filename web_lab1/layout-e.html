@@ -7,8 +7,9 @@
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-<!-- Макет д): у шапці 1 вкладено логотип, праворуч блок 4 не на всю висоту (клас short) -->
-<div class="layout col">
+<!-- Макет д): у шапці 1 вкладено логотип, а блоки 3, 4 і вкладений червоний блок
+     лежать у контейнері .content, який єдиний у проєкті має внутрішні поля -->
+<div class="layout col alt">
     <header class="head">
         <span class="logo">Логотип</span>
         1. Шапка сторінки
@@ -17,27 +18,34 @@
     <div class="row">
         <aside class="side">2. Бічна панель</aside>
 
-        <main class="main">
-            <h1>3. Основний блок</h1>
+        <div class="content">
+            <div class="note">Вкладений блок</div>
 
-            <ul>
-                <li>HTML — мова розмітки документа</li>
-                <li>CSS — мова опису стилів</li>
-                <li>Адаптивність — медіазапити</li>
-            </ul>
+            <div class="row">
+                <main class="main">
+                    <h1>3. Основний блок</h1>
 
-            <div class="text">
-                <p>У макеті <b>д)</b> шапка містить <i>вкладений</i> блок —
-                    логотип <span class="tag">span.logo</span> зі своїм
-                    оформленням і власною реакцією на курсор.</p>
+                    <ul>
+                        <li>HTML — мова розмітки документа</li>
+                        <li>CSS — мова опису стилів</li>
+                        <li>Адаптивність — медіазапити</li>
+                    </ul>
 
-                <p>Правий блок отримав клас <span class="tag">.short</span>
-                    з властивістю <span class="tag">align-self: flex-start</span>,
-                    тому він не розтягується на всю висоту рядка, як інші колонки.</p>
+                    <div class="text">
+                        <p>У макеті <b>д)</b> шапка містить <i>вкладений</i> блок —
+                            логотип <span class="tag">span.logo</span> зі своїм
+                            оформленням і власною реакцією на курсор.</p>
+
+                        <p>Блоки 3, 4 і червоний вкладений блок лежать у контейнері
+                            <span class="tag">.content</span>, якому задано
+                            <span class="tag">padding</span>, тому вони не торкаються
+                            ні бічної панелі, ні шапки, ні підвалу.</p>
+                    </div>
+                </main>
+
+                <div class="extra">4. Додатковий блок</div>
             </div>
-        </main>
-
-        <div class="extra short">4. Додатковий блок</div>
+        </div>
     </div>
 
     <footer class="foot">5. Підвал сторінки</footer>
