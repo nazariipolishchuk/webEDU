@@ -541,6 +541,11 @@
 
     .logo {
         padding-block: var(--gap);
+        font-size: var(--fs-m);
+    }
+
+    .button {
+        padding-inline: var(--gap-s);
     }
 
     .header__actions {
@@ -555,7 +560,7 @@
     .nav__list {
         flex-direction: row;
         justify-content: center;
-        gap: var(--gap-l);
+        gap: var(--gap);
         height: 100%;
         border-top: 0;
     }
@@ -568,6 +573,7 @@
     .nav__link {
         display: flex;
         align-items: center;
+        font-size: var(--fs-s);
     }
 
     .sidebar {
@@ -600,5 +606,21 @@
             "header header header header"
             ".      aside  main   ."
             "footer footer footer footer";
+    }
+
+    .logo {
+        font-size: var(--fs-l);
+    }
+
+    .nav__list {
+        gap: var(--gap-l);
+    }
+
+    .nav__link {
+        font-size: var(--fs-base);
+    }
+
+    .button {
+        padding-inline: var(--gap);
     }
 }
