@@ -1,21 +1,29 @@
-/* ДатаДар — кабінет лікаря. Mobile first, BEM: один клас на селектор. */
+/* DrAnnotation — doctor's dashboard. Mobile first, BEM: one class per selector.
+   Palettes (coolors.co, popular):
+   medical    E63946 F1FAEE A8DADC 457B9D 1D3557
+   scientific 001219 005F73 0A9396 94D2BD E9D8A6 EE9B00 CA6702 BB3E03 AE2012 9B2226 */
 
 :root {
     color-scheme: light;
 
-    --color-bg: #f3f5f4;
+    --color-bg: #f1faee;
     --color-surface: #ffffff;
-    --color-ink: #17202b;
-    --color-muted: #4b5866;
-    --color-line: #d5dbe0;
-    --color-accent: #24507a;
-    --color-accent-ink: #ffffff;
-    --color-accent-soft: #e3ecf5;
-    --color-focus: #c2410c;
-    --color-collecting: #8a5a00;
-    --color-collecting-soft: #fbefd6;
-    --color-review: #7a3a8c;
-    --color-review-soft: #f3e6f7;
+    --color-ink: #001219;
+    --color-heading: #1d3557;
+    --color-muted: #3f5568;
+    --color-line: #d4e4e6;
+    --color-rule: #1d3557;
+    --color-link: #005f73;
+    --color-masthead: #1d3557;
+    --color-masthead-ink: #f1faee;
+    --color-masthead-line: #457b9d;
+    --color-red: #e63946;
+    --color-red-strong: #ae2012;
+    --color-on-red: #ffffff;
+    --color-ready: #0a9396;
+    --color-collecting: #ee9b00;
+    --color-review: #457b9d;
+    --color-focus: #ee9b00;
 
     --gap: 1rem;
     --gap-xs: calc(var(--gap) / 4);
@@ -23,58 +31,65 @@
     --gap-l: calc(var(--gap) * 1.5);
     --gap-xl: calc(var(--gap) * 2.5);
 
-    --radius: 0.75rem;
-    --radius-s: 0.375rem;
+    --radius: 0;
+    --radius-s: 2px;
     --border: 1px;
+    --rule: 4px;
+    --bar: 3px;
+    --underline: 2px;
 
-    --font-body: "Segoe UI", system-ui, -apple-system, Roboto, sans-serif;
+    --font-body: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    --font-head: Georgia, "Times New Roman", serif;
     --fs-xs: 0.8125rem;
-    --fs-s: 0.875rem;
+    --fs-s: 0.9375rem;
     --fs-base: 1rem;
-    --fs-m: 1.125rem;
-    --fs-l: 1.375rem;
-    --fs-xl: clamp(1.75rem, 1.2rem + 2vw, 2.5rem);
+    --fs-m: 1.25rem;
+    --fs-l: 1.625rem;
+    --fs-stat: clamp(2rem, 1.6rem + 1.4vw, 2.75rem);
+    --fs-xl: clamp(2.25rem, 1.6rem + 2.6vw, 3.5rem);
     --line-height: 1.55;
-    --line-height-tight: 1.2;
+    --line-height-lead: 1.5;
+    --line-height-head: 1.15;
+    --tracking-tight: -0.015em;
 
-    --aside-width: 15rem;
-    --content-max: 75rem;
+    --aside-width: 16rem;
+    --content-max: 78rem;
     --page-inline: max(var(--gap), calc((100% - var(--content-max)) / 2));
+    --stat-min: 9rem;
+    --card-min: 12.5rem;
+    --count-min: 2rem;
+    --measure: 62ch;
+    --dot: 0.625rem;
     --focus-width: 3px;
     --focus-offset: 2px;
 
-    --stat-min: 12rem;
-    --card-min: 13rem;
-    --measure: 60ch;
-    --underline: 2px;
+    --shadow: 0 1rem 2rem rgba(29, 53, 87, 0.18);
+    --lift: -0.375rem;
+    --nudge: 0.25rem;
     --hover-opacity: 0.85;
-
-    --shadow: 0 0.75rem 1.75rem rgba(23, 32, 43, 0.16);
-    --lift: -0.25rem;
-    --duration: 0.2s;
-    --easing: ease-out;
+    --duration: 0.25s;
+    --easing: cubic-bezier(0.2, 0.7, 0.2, 1);
 }
 
-/* Темна тема: перевизначаємо лише змінні */
+/* Dark theme: only the variables change */
 @media (prefers-color-scheme: dark) {
     :root {
         color-scheme: dark;
 
-        --color-bg: #0f151c;
-        --color-surface: #18212b;
-        --color-ink: #e6edf3;
-        --color-muted: #a7b4c2;
-        --color-line: #2c3a48;
-        --color-accent: #8cc2f2;
-        --color-accent-ink: #0f151c;
-        --color-accent-soft: #1d3247;
-        --color-focus: #ffb37a;
-        --color-collecting: #f2c46b;
-        --color-collecting-soft: #3a2f17;
-        --color-review: #dcaaf0;
-        --color-review-soft: #35233d;
+        --color-bg: #001219;
+        --color-surface: #0a2230;
+        --color-ink: #f1faee;
+        --color-heading: #f1faee;
+        --color-muted: #a8dadc;
+        --color-line: #18394a;
+        --color-rule: #94d2bd;
+        --color-link: #94d2bd;
+        --color-ready: #94d2bd;
+        --color-collecting: #e9d8a6;
+        --color-review: #a8dadc;
+        --color-focus: #e9d8a6;
 
-        --shadow: 0 0.75rem 1.75rem rgba(0, 0, 0, 0.5);
+        --shadow: 0 1rem 2rem rgba(0, 0, 0, 0.55);
     }
 }
 
@@ -82,7 +97,7 @@
     box-sizing: border-box;
 }
 
-/* Каркас: на вузькому екрані всі області одна під одною */
+/* Page frame: on narrow screens every area stacks */
 .page {
     margin: 0;
     min-height: 100vh;
@@ -102,7 +117,7 @@
     line-height: var(--line-height);
 }
 
-/* Шапка: логотип, навігація і кнопки — flex; на мобільному стовпцем */
+/* Masthead: logo, navigation and actions — one flex row from 768px */
 .header {
     grid-area: header;
     display: flex;
@@ -110,8 +125,9 @@
     align-items: flex-start;
     gap: var(--gap);
     padding: var(--gap) var(--page-inline);
-    background: var(--color-surface);
-    border-bottom: var(--border) solid var(--color-line);
+    background: var(--color-masthead);
+    color: var(--color-masthead-ink);
+    border-bottom: var(--rule) solid var(--color-red);
 }
 
 .header__actions {
@@ -123,15 +139,24 @@
 .logo {
     display: inline-flex;
     align-items: center;
-    gap: var(--gap-s);
-    color: var(--color-ink);
+    color: var(--color-masthead-ink);
     font-size: var(--fs-l);
-    font-weight: 700;
+    line-height: 1;
+    letter-spacing: var(--tracking-tight);
     text-decoration: none;
 }
 
 .logo__mark {
     display: block;
+    margin-right: var(--gap-s);
+}
+
+.logo__name {
+    font-weight: 800;
+}
+
+.logo__word {
+    font-weight: 300;
 }
 
 .nav {
@@ -141,67 +166,75 @@
 .nav__list {
     display: flex;
     flex-direction: column;
-    gap: var(--gap-xs);
     margin: 0;
     padding: 0;
     list-style: none;
+    border-top: var(--border) solid var(--color-masthead-line);
+}
+
+.nav__item {
+    border-bottom: var(--border) solid var(--color-masthead-line);
 }
 
 .nav__link {
     position: relative;
-    display: inline-block;
-    padding: var(--gap-xs) 0;
-    color: var(--color-ink);
-    text-decoration: none;
-}
-
-.nav__link--active {
-    color: var(--color-accent);
+    display: block;
+    padding: var(--gap-s) 0;
+    color: var(--color-masthead-ink);
     font-weight: 600;
+    text-decoration: none;
 }
 
 .button {
     display: inline-flex;
     align-items: center;
     padding: var(--gap-s) var(--gap);
-    border: var(--border) solid var(--color-line);
+    border: var(--border) solid var(--color-masthead-ink);
     border-radius: var(--radius-s);
-    background: var(--color-surface);
-    color: var(--color-ink);
+    color: var(--color-masthead-ink);
     font-size: var(--fs-s);
-    font-weight: 600;
+    font-weight: 700;
     text-decoration: none;
     white-space: nowrap;
 }
 
 .button--primary {
-    border-color: var(--color-accent);
-    background: var(--color-accent);
-    color: var(--color-accent-ink);
+    border-color: var(--color-red-strong);
+    background: var(--color-red-strong);
+    color: var(--color-on-red);
 }
 
-/* Бічна панель: меню розділів кабінету */
+/* Sidebar: the doctor and dashboard sections */
 .sidebar {
     grid-area: aside;
     padding: var(--gap);
+    background: var(--color-surface);
     border-bottom: var(--border) solid var(--color-line);
 }
 
-.sidebar__doctor {
-    margin: 0 0 var(--gap);
-    font-weight: 600;
+.doctor {
+    margin-bottom: var(--gap);
+    padding-bottom: var(--gap);
+    border-bottom: var(--border) solid var(--color-line);
 }
 
-.sidebar__role {
+.doctor__name {
+    margin: 0;
+    color: var(--color-heading);
+    font-family: var(--font-head);
+    font-size: var(--fs-m);
+    font-weight: 700;
+}
+
+.doctor__role {
+    margin: 0;
     color: var(--color-muted);
     font-size: var(--fs-s);
-    font-weight: 400;
 }
 
 .menu__list {
     display: flex;
     flex-direction: column;
-    gap: var(--gap-xs);
     margin: 0;
     padding: 0;
     list-style: none;
@@ -212,57 +245,72 @@
     align-items: center;
     justify-content: space-between;
     gap: var(--gap-s);
-    padding: var(--gap-s);
-    border-radius: var(--radius-s);
+    padding: var(--gap-s) var(--gap-s) var(--gap-s) var(--gap);
+    border-left: var(--bar) solid transparent;
     color: var(--color-ink);
     font-size: var(--fs-s);
     text-decoration: none;
 }
 
 .menu__link--active {
-    background: var(--color-accent-soft);
-    color: var(--color-accent);
-    font-weight: 600;
+    border-left-color: var(--color-red);
+    color: var(--color-heading);
+    font-weight: 700;
 }
 
 .menu__count {
+    min-width: var(--count-min);
+    padding: 0 var(--gap-xs);
+    background: var(--color-bg);
     color: var(--color-muted);
     font-size: var(--fs-xs);
+    font-weight: 600;
+    text-align: center;
     font-variant-numeric: tabular-nums;
 }
 
-/* Основна область */
+/* Main area */
 .content {
     grid-area: main;
     min-width: 0;
-    padding: var(--gap-l) var(--gap);
+    padding: var(--gap-l) var(--gap) var(--gap-xl);
 }
 
 .content__title {
     margin: 0 0 var(--gap-s);
+    color: var(--color-heading);
+    font-family: var(--font-head);
     font-size: var(--fs-xl);
-    line-height: var(--line-height-tight);
+    font-weight: 700;
+    line-height: var(--line-height-head);
+    letter-spacing: var(--tracking-tight);
 }
 
 .content__lead {
     max-width: var(--measure);
-    margin: 0 0 var(--gap-l);
+    margin: 0 0 var(--gap-xl);
     color: var(--color-muted);
+    font-size: var(--fs-m);
+    line-height: var(--line-height-lead);
 }
 
-/* Зведені дані: картки показників */
-.pulse {
+/* Section heading under a heavy rule, newsroom style */
+.section-title {
+    margin: 0 0 var(--gap);
+    padding-top: var(--gap-s);
+    border-top: var(--rule) solid var(--color-rule);
+    color: var(--color-heading);
+    font-family: var(--font-head);
+    font-size: var(--fs-l);
+    line-height: var(--line-height-head);
+}
+
+/* Summary figures */
+.summary {
     margin-bottom: var(--gap-xl);
 }
 
-.pulse__title,
-.catalog__title {
-    margin: 0 0 var(--gap);
-    font-size: var(--fs-l);
-    line-height: var(--line-height-tight);
-}
-
-.pulse__list {
+.summary__list {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(min(100%, var(--stat-min)), 1fr));
     gap: var(--gap);
@@ -274,23 +322,23 @@
 .stat {
     display: flex;
     flex-direction: column;
-    gap: var(--gap-xs);
-    padding: var(--gap);
-    border: var(--border) solid var(--color-line);
-    border-left: var(--focus-width) solid var(--color-accent);
-    border-radius: var(--radius-s);
+    padding: var(--gap) var(--gap) var(--gap-l);
+    border-top: var(--bar) solid var(--color-red);
     background: var(--color-surface);
 }
 
 .stat__value {
-    font-size: var(--fs-xl);
+    color: var(--color-heading);
+    font-family: var(--font-head);
+    font-size: var(--fs-stat);
     font-weight: 700;
-    line-height: var(--line-height-tight);
-    font-variant-numeric: tabular-nums;
+    line-height: var(--line-height-head);
+    font-variant-numeric: lining-nums tabular-nums;
 }
 
 .stat__label {
-    font-weight: 600;
+    margin-top: var(--gap-xs);
+    font-weight: 700;
 }
 
 .stat__note {
@@ -298,11 +346,11 @@
     font-size: var(--fs-s);
 }
 
-/* Датасети: адаптивна сітка без медіа-запитів */
+/* Datasets: responsive without media queries */
 .catalog__list {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(min(100%, var(--card-min)), 1fr));
-    gap: var(--gap-l);
+    gap: var(--gap-l) var(--gap);
     margin: 0;
     padding: 0;
     list-style: none;
@@ -313,11 +361,9 @@
     display: flex;
     flex-direction: column;
     gap: var(--gap-s);
-    padding: 0 0 var(--gap);
-    border: var(--border) solid var(--color-line);
+    padding-bottom: var(--gap);
     border-radius: var(--radius);
     background: var(--color-surface);
-    overflow: hidden;
 }
 
 .card__image {
@@ -327,33 +373,40 @@
     height: auto;
     aspect-ratio: 8 / 5;
     object-fit: cover;
+    border-bottom: var(--bar) solid var(--color-red);
 }
 
 .card__status {
-    align-self: flex-start;
-    margin: 0 var(--gap);
-    padding: 0 var(--gap-s);
-    border-radius: var(--radius-s);
-    background: var(--color-accent-soft);
-    color: var(--color-accent);
+    display: inline-flex;
+    align-items: center;
+    gap: var(--gap-s);
+    margin: var(--gap-xs) var(--gap) 0;
+    color: var(--color-muted);
     font-size: var(--fs-xs);
-    font-weight: 600;
+    font-weight: 700;
 }
 
-.card--collecting {
-    --color-accent: var(--color-collecting);
-    --color-accent-soft: var(--color-collecting-soft);
+.card__status::before {
+    content: "";
+    width: var(--dot);
+    height: var(--dot);
+    background: var(--color-ready);
 }
 
-.card--review {
-    --color-accent: var(--color-review);
-    --color-accent-soft: var(--color-review-soft);
+.card__status--collecting::before {
+    background: var(--color-collecting);
+}
+
+.card__status--review::before {
+    background: var(--color-review);
 }
 
 .card__title {
     margin: 0 var(--gap);
+    color: var(--color-heading);
+    font-family: var(--font-head);
     font-size: var(--fs-m);
-    line-height: var(--line-height-tight);
+    line-height: var(--line-height-head);
 }
 
 .card__text {
@@ -365,21 +418,21 @@
 
 .card__link {
     margin: 0 var(--gap);
-    color: var(--color-accent);
-    font-weight: 600;
+    color: var(--color-link);
+    font-weight: 700;
+    text-decoration-thickness: var(--underline);
     text-underline-offset: var(--gap-xs);
 }
 
-/* Підвал */
+/* Footer */
 .footer {
     grid-area: footer;
     display: flex;
     flex-direction: column;
     gap: var(--gap-xs);
-    padding: var(--gap) var(--page-inline);
-    border-top: var(--border) solid var(--color-line);
-    background: var(--color-surface);
-    color: var(--color-muted);
+    padding: var(--gap-l) var(--page-inline);
+    background: var(--color-masthead);
+    color: var(--color-masthead-ink);
     font-size: var(--fs-s);
 }
 
@@ -387,7 +440,7 @@
     margin: 0;
 }
 
-/* Видимий фокус для клавіатури */
+/* Visible keyboard focus */
 .logo:focus-visible,
 .nav__link:focus-visible,
 .menu__link:focus-visible,
@@ -395,10 +448,9 @@
 .card__link:focus-visible {
     outline: var(--focus-width) solid var(--color-focus);
     outline-offset: var(--focus-offset);
-    border-radius: var(--radius-s);
 }
 
-/* Переходи: анімуємо лише transform і opacity */
+/* Transitions: only transform and opacity are animated */
 .card {
     transition: transform var(--duration) var(--easing);
 }
@@ -407,7 +459,6 @@
     content: "";
     position: absolute;
     inset: 0;
-    border-radius: inherit;
     box-shadow: var(--shadow);
     opacity: 0;
     pointer-events: none;
@@ -430,8 +481,8 @@
     left: 0;
     right: 0;
     bottom: 0;
-    height: var(--underline);
-    background: currentColor;
+    height: var(--rule);
+    background: var(--color-red);
     transform: scaleX(0);
     transform-origin: left;
     transition: transform var(--duration) var(--easing);
@@ -449,7 +500,7 @@
 
 .menu__link:hover,
 .menu__link:focus-visible {
-    transform: translateX(var(--gap-xs));
+    transform: translateX(var(--nudge));
 }
 
 .button {
@@ -471,7 +522,7 @@
     }
 }
 
-/* Від 768 px: з'являється бічна панель, шапка стає рядком */
+/* From 768px: the sidebar appears and the masthead becomes one row */
 @media (min-width: 48em) {
     .page {
         grid-template-columns: var(--aside-width) minmax(0, 1fr);
@@ -484,6 +535,15 @@
 
     .header {
         flex-direction: row;
+        align-items: stretch;
+        padding-block: 0;
+    }
+
+    .logo {
+        padding-block: var(--gap);
+    }
+
+    .header__actions {
         align-items: center;
     }
 
@@ -496,6 +556,18 @@
         flex-direction: row;
         justify-content: center;
         gap: var(--gap-l);
+        height: 100%;
+        border-top: 0;
+    }
+
+    .nav__item {
+        display: flex;
+        border-bottom: 0;
+    }
+
+    .nav__link {
+        display: flex;
+        align-items: center;
     }
 
     .sidebar {
@@ -505,7 +577,7 @@
     }
 
     .content {
-        padding: var(--gap-l) var(--gap-xl);
+        padding: var(--gap-xl);
     }
 
     .footer {
@@ -515,8 +587,8 @@
     }
 }
 
-/* Від 1200 px: остаточний вигляд, ширина вмісту обмежена.
-   Шапка й підвал далі на всю ширину, бічні колонки — порожні поля. */
+/* From 1200px: final layout, the content width is capped.
+   Masthead and footer still span the full width; side tracks are empty margins. */
 @media (min-width: 75em) {
     .page {
         grid-template-columns:
