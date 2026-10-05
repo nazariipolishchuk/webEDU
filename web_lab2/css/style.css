@@ -42,6 +42,40 @@
     --page-inline: max(var(--gap), calc((100% - var(--content-max)) / 2));
     --focus-width: 3px;
     --focus-offset: 2px;
+
+    --stat-min: 12rem;
+    --card-min: 13rem;
+    --measure: 60ch;
+    --underline: 2px;
+    --hover-opacity: 0.85;
+
+    --shadow: 0 0.75rem 1.75rem rgba(23, 32, 43, 0.16);
+    --lift: -0.25rem;
+    --duration: 0.2s;
+    --easing: ease-out;
+}
+
+/* Темна тема: перевизначаємо лише змінні */
+@media (prefers-color-scheme: dark) {
+    :root {
+        color-scheme: dark;
+
+        --color-bg: #0f151c;
+        --color-surface: #18212b;
+        --color-ink: #e6edf3;
+        --color-muted: #a7b4c2;
+        --color-line: #2c3a48;
+        --color-accent: #8cc2f2;
+        --color-accent-ink: #0f151c;
+        --color-accent-soft: #1d3247;
+        --color-focus: #ffb37a;
+        --color-collecting: #f2c46b;
+        --color-collecting-soft: #3a2f17;
+        --color-review: #dcaaf0;
+        --color-review-soft: #35233d;
+
+        --shadow: 0 0.75rem 1.75rem rgba(0, 0, 0, 0.5);
+    }
 }
 
 *, *::before, *::after {
@@ -149,7 +183,7 @@
 /* Бічна панель: меню розділів кабінету */
 .sidebar {
     grid-area: aside;
-    padding: var(--gap) var(--gap);
+    padding: var(--gap);
     border-bottom: var(--border) solid var(--color-line);
 }
 
@@ -211,7 +245,7 @@
 }
 
 .content__lead {
-    max-width: 60ch;
+    max-width: var(--measure);
     margin: 0 0 var(--gap-l);
     color: var(--color-muted);
 }
@@ -230,7 +264,7 @@
 
 .pulse__list {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, var(--stat-min)), 1fr));
     gap: var(--gap);
     margin: 0;
     padding: 0;
@@ -267,7 +301,7 @@
 /* Датасети: адаптивна сітка без медіа-запитів */
 .catalog__list {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(min(100%, 15rem), 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, var(--card-min)), 1fr));
     gap: var(--gap-l);
     margin: 0;
     padding: 0;
@@ -362,6 +396,79 @@
     outline: var(--focus-width) solid var(--color-focus);
     outline-offset: var(--focus-offset);
     border-radius: var(--radius-s);
+}
+
+/* Переходи: анімуємо лише transform і opacity */
+.card {
+    transition: transform var(--duration) var(--easing);
+}
+
+.card::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    box-shadow: var(--shadow);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity var(--duration) var(--easing);
+}
+
+.card:hover,
+.card:focus-within {
+    transform: translateY(var(--lift));
+}
+
+.card:hover::after,
+.card:focus-within::after {
+    opacity: 1;
+}
+
+.nav__link::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: var(--underline);
+    background: currentColor;
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform var(--duration) var(--easing);
+}
+
+.nav__link:hover::after,
+.nav__link:focus-visible::after,
+.nav__link--active::after {
+    transform: scaleX(1);
+}
+
+.menu__link {
+    transition: transform var(--duration) var(--easing);
+}
+
+.menu__link:hover,
+.menu__link:focus-visible {
+    transform: translateX(var(--gap-xs));
+}
+
+.button {
+    transition: opacity var(--duration) var(--easing);
+}
+
+.button:hover,
+.button:focus-visible {
+    opacity: var(--hover-opacity);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .card,
+    .card::after,
+    .nav__link::after,
+    .menu__link,
+    .button {
+        transition: none;
+    }
 }
 
 /* Від 768 px: з'являється бічна панель, шапка стає рядком */
