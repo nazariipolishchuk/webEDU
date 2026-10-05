@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="ДатаДар — благодійна платформа, де лікарі передають знеособлені медичні знімки у відкриті датасети для навчання моделей виявлення патологій.">
+    <title>ДатаДар — кабінет лікаря</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="page">
+<header class="header">
+    <a class="logo" href="#overview">
+        <img class="logo__mark" src="img/logo.svg" alt="" width="32" height="32">
+        <span class="logo__text">ДатаДар</span>
+    </a>
+
+    <nav class="nav" aria-label="Головна навігація">
+        <ul class="nav__list">
+            <li class="nav__item"><a class="nav__link nav__link--active" href="#overview" aria-current="page">Огляд</a></li>
+            <li class="nav__item"><a class="nav__link" href="#datasets">Датасети</a></li>
+            <li class="nav__item"><a class="nav__link" href="#labeling">Розмітка</a></li>
+            <li class="nav__item"><a class="nav__link" href="#rules">Правила</a></li>
+        </ul>
+    </nav>
+
+    <div class="header__actions">
+        <a class="button button--primary" href="#upload">Завантажити знімки</a>
+        <a class="button" href="#profile">Профіль</a>
+    </div>
+</header>
+
+<aside class="sidebar">
+    <p class="sidebar__doctor">Д-р Олена Коваль<br>
+        <span class="sidebar__role">Лікарка-рентгенологиня, Черкаси</span></p>
+
+    <nav class="menu" aria-label="Розділи кабінету">
+        <ul class="menu__list">
+            <li class="menu__item"><a class="menu__link menu__link--active" href="#overview">Огляд</a></li>
+            <li class="menu__item"><a class="menu__link" href="#uploads">Мої завантаження <span class="menu__count">312</span></a></li>
+            <li class="menu__item"><a class="menu__link" href="#labeling">Черга розмітки <span class="menu__count">18</span></a></li>
+            <li class="menu__item"><a class="menu__link" href="#anonymization">Перевірка знеособлення <span class="menu__count">4</span></a></li>
+            <li class="menu__item"><a class="menu__link" href="#datasets">Датасети</a></li>
+            <li class="menu__item"><a class="menu__link" href="#members">Учасники</a></li>
+            <li class="menu__item"><a class="menu__link" href="#settings">Налаштування</a></li>
+        </ul>
+    </nav>
+</aside>
+
+<main class="content" id="overview">
+    <h1 class="content__title">Огляд проєкту</h1>
+    <p class="content__lead">Знімки й записи, які лікарі передали для навчання моделей,
+        що допомагатимуть виявляти патології. Кожен файл знеособлюється до потрапляння в датасет.</p>
+
+    <section class="pulse" aria-labelledby="pulse-title">
+        <h2 class="pulse__title" id="pulse-title">Зведені дані</h2>
+        <ul class="pulse__list">
+            <li class="stat">
+                <span class="stat__value">48 216</span>
+                <span class="stat__label">знімків передано</span>
+                <span class="stat__note">+1 312 за тиждень</span>
+            </li>
+            <li class="stat">
+                <span class="stat__value">1 274</span>
+                <span class="stat__label">лікарі-учасники</span>
+                <span class="stat__note">з 23 областей</span>
+            </li>
+            <li class="stat">
+                <span class="stat__value">63 %</span>
+                <span class="stat__label">розмічено двома лікарями</span>
+                <span class="stat__note">мета — 80 % до весни</span>
+            </li>
+            <li class="stat">
+                <span class="stat__value">99,2 %</span>
+                <span class="stat__label">пройшли перевірку знеособлення</span>
+                <span class="stat__note">решта — на ручному розгляді</span>
+            </li>
+        </ul>
+    </section>
+
+    <section class="catalog" id="datasets" aria-labelledby="datasets-title">
+        <h2 class="catalog__title" id="datasets-title">Датасети</h2>
+        <ul class="catalog__list">
+            <li class="card card--ready">
+                <img class="card__image" src="img/chest-xray.svg" alt="Схема рентгенограми грудної клітки" width="320" height="200">
+                <span class="card__status">Готовий до навчання</span>
+                <h3 class="card__title">Рентген грудної клітки — пневмонія</h3>
+                <p class="card__text">Прямі проєкції дорослих пацієнтів, кожен знімок розмітили два рентгенологи.</p>
+                <a class="card__link" href="#dataset-chest">Переглянути 12 480 знімків</a>
+            </li>
+            <li class="card card--ready">
+                <img class="card__image" src="img/brain-mri.svg" alt="Схема МРТ-зрізу головного мозку" width="320" height="200">
+                <span class="card__status">Готовий до навчання</span>
+                <h3 class="card__title">МРТ головного мозку — пухлини</h3>
+                <p class="card__text">Аксіальні зрізи T1 і T2 з контурами новоутворень, які обвели нейрорадіологи.</p>
+                <a class="card__link" href="#dataset-brain">Переглянути 6 920 зрізів</a>
+            </li>
+            <li class="card card--collecting">
+                <img class="card__image" src="img/ecg.svg" alt="Схема запису електрокардіограми" width="320" height="200">
+                <span class="card__status">Триває збір</span>
+                <h3 class="card__title">ЕКГ — порушення ритму</h3>
+                <p class="card__text">Записи у 12 відведеннях з висновком кардіолога: фібриляція передсердь, блокади, екстрасистолії.</p>
+                <a class="card__link" href="#dataset-ecg">Переглянути 9 305 записів</a>
+            </li>
+            <li class="card card--collecting">
+                <img class="card__image" src="img/dermatoscopy.svg" alt="Схема дерматоскопії родимки" width="320" height="200">
+                <span class="card__status">Триває збір</span>
+                <h3 class="card__title">Дерматоскопія — меланома</h3>
+                <p class="card__text">Знімки новоутворень шкіри з результатом гістології, коли біопсію робили.</p>
+                <a class="card__link" href="#dataset-skin">Переглянути 4 118 знімків</a>
+            </li>
+            <li class="card card--review">
+                <img class="card__image" src="img/histology.svg" alt="Схема гістологічного препарату з клітинами" width="320" height="200">
+                <span class="card__status">На перевірці</span>
+                <h3 class="card__title">Гістологія — пухлини молочної залози</h3>
+                <p class="card__text">Скани скелець, забарвлених гематоксиліном і еозином, з позначеними ділянками пухлини.</p>
+                <a class="card__link" href="#dataset-histology">Переглянути 2 760 сканів</a>
+            </li>
+            <li class="card card--ready">
+                <img class="card__image" src="img/fundus.svg" alt="Схема знімка очного дна" width="320" height="200">
+                <span class="card__status">Готовий до навчання</span>
+                <h3 class="card__title">Очне дно — діабетична ретинопатія</h3>
+                <p class="card__text">Фото сітківки зі стадією ретинопатії за міжнародною шкалою від офтальмолога.</p>
+                <a class="card__link" href="#dataset-fundus">Переглянути 5 640 фото</a>
+            </li>
+            <li class="card card--collecting">
+                <img class="card__image" src="img/lung-ct.svg" alt="Схема КТ-зрізу легень з вузликом" width="320" height="200">
+                <span class="card__status">Триває збір</span>
+                <h3 class="card__title">КТ легень — вузлики</h3>
+                <p class="card__text">Серії зрізів з координатами й розміром кожного вузлика понад 3 мм.</p>
+                <a class="card__link" href="#dataset-ct">Переглянути 3 215 серій</a>
+            </li>
+            <li class="card card--review">
+                <img class="card__image" src="img/bone-xray.svg" alt="Схема рентгенограми кисті з переломом" width="320" height="200">
+                <span class="card__status">На перевірці</span>
+                <h3 class="card__title">Рентген кісток — переломи</h3>
+                <p class="card__text">Знімки кистей і передпліч від травматологів, лінію перелому обведено.</p>
+                <a class="card__link" href="#dataset-bone">Переглянути 3 776 знімків</a>
+            </li>
+        </ul>
+    </section>
+</main>
+
+<footer class="footer">
+    <p class="footer__text">ДатаДар — благодійний проєкт. Приймаємо лише знеособлені дані, власником датасетів лишається спільнота.</p>
+    <p class="footer__text">Лабораторна робота №2, Поліщук Н. М., ПЗ-2404</p>
+</footer>
+</body>
+</html>

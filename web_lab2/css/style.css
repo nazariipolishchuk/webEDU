@@ -1,0 +1,300 @@
+/* ДатаДар — кабінет лікаря. Mobile first, BEM: один клас на селектор. */
+
+:root {
+    color-scheme: light;
+
+    --color-bg: #f3f5f4;
+    --color-surface: #ffffff;
+    --color-ink: #17202b;
+    --color-muted: #4b5866;
+    --color-line: #d5dbe0;
+    --color-accent: #24507a;
+    --color-accent-ink: #ffffff;
+    --color-accent-soft: #e3ecf5;
+    --color-focus: #c2410c;
+
+    --gap: 1rem;
+    --gap-xs: calc(var(--gap) / 4);
+    --gap-s: calc(var(--gap) / 2);
+    --gap-l: calc(var(--gap) * 1.5);
+    --gap-xl: calc(var(--gap) * 2.5);
+
+    --radius: 0.75rem;
+    --radius-s: 0.375rem;
+    --border: 1px;
+
+    --font-body: "Segoe UI", system-ui, -apple-system, Roboto, sans-serif;
+    --fs-xs: 0.8125rem;
+    --fs-s: 0.875rem;
+    --fs-base: 1rem;
+    --fs-m: 1.125rem;
+    --fs-l: 1.375rem;
+    --fs-xl: clamp(1.75rem, 1.2rem + 2vw, 2.5rem);
+    --line-height: 1.55;
+    --line-height-tight: 1.2;
+
+    --aside-width: 15rem;
+    --content-max: 75rem;
+    --page-inline: max(var(--gap), calc((100% - var(--content-max)) / 2));
+    --focus-width: 3px;
+    --focus-offset: 2px;
+}
+
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
+/* Каркас: на вузькому екрані всі області одна під одною */
+.page {
+    margin: 0;
+    min-height: 100vh;
+    min-height: 100dvh;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto auto 1fr auto;
+    grid-template-areas:
+        "header"
+        "aside"
+        "main"
+        "footer";
+    background: var(--color-bg);
+    color: var(--color-ink);
+    font-family: var(--font-body);
+    font-size: var(--fs-base);
+    line-height: var(--line-height);
+}
+
+/* Шапка: логотип, навігація і кнопки — flex; на мобільному стовпцем */
+.header {
+    grid-area: header;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--gap);
+    padding: var(--gap) var(--page-inline);
+    background: var(--color-surface);
+    border-bottom: var(--border) solid var(--color-line);
+}
+
+.header__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--gap-s);
+}
+
+.logo {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--gap-s);
+    color: var(--color-ink);
+    font-size: var(--fs-l);
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.logo__mark {
+    display: block;
+}
+
+.nav {
+    width: 100%;
+}
+
+.nav__list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-xs);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.nav__link {
+    position: relative;
+    display: inline-block;
+    padding: var(--gap-xs) 0;
+    color: var(--color-ink);
+    text-decoration: none;
+}
+
+.nav__link--active {
+    color: var(--color-accent);
+    font-weight: 600;
+}
+
+.button {
+    display: inline-flex;
+    align-items: center;
+    padding: var(--gap-s) var(--gap);
+    border: var(--border) solid var(--color-line);
+    border-radius: var(--radius-s);
+    background: var(--color-surface);
+    color: var(--color-ink);
+    font-size: var(--fs-s);
+    font-weight: 600;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.button--primary {
+    border-color: var(--color-accent);
+    background: var(--color-accent);
+    color: var(--color-accent-ink);
+}
+
+/* Бічна панель: меню розділів кабінету */
+.sidebar {
+    grid-area: aside;
+    padding: var(--gap) var(--gap);
+    border-bottom: var(--border) solid var(--color-line);
+}
+
+.sidebar__doctor {
+    margin: 0 0 var(--gap);
+    font-weight: 600;
+}
+
+.sidebar__role {
+    color: var(--color-muted);
+    font-size: var(--fs-s);
+    font-weight: 400;
+}
+
+.menu__list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-xs);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.menu__link {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--gap-s);
+    padding: var(--gap-s);
+    border-radius: var(--radius-s);
+    color: var(--color-ink);
+    font-size: var(--fs-s);
+    text-decoration: none;
+}
+
+.menu__link--active {
+    background: var(--color-accent-soft);
+    color: var(--color-accent);
+    font-weight: 600;
+}
+
+.menu__count {
+    color: var(--color-muted);
+    font-size: var(--fs-xs);
+    font-variant-numeric: tabular-nums;
+}
+
+/* Основна область */
+.content {
+    grid-area: main;
+    min-width: 0;
+    padding: var(--gap-l) var(--gap);
+}
+
+.content__title {
+    margin: 0 0 var(--gap-s);
+    font-size: var(--fs-xl);
+    line-height: var(--line-height-tight);
+}
+
+.content__lead {
+    max-width: 60ch;
+    margin: 0 0 var(--gap-l);
+    color: var(--color-muted);
+}
+
+/* Підвал */
+.footer {
+    grid-area: footer;
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-xs);
+    padding: var(--gap) var(--page-inline);
+    border-top: var(--border) solid var(--color-line);
+    background: var(--color-surface);
+    color: var(--color-muted);
+    font-size: var(--fs-s);
+}
+
+.footer__text {
+    margin: 0;
+}
+
+/* Видимий фокус для клавіатури */
+.logo:focus-visible,
+.nav__link:focus-visible,
+.menu__link:focus-visible,
+.button:focus-visible {
+    outline: var(--focus-width) solid var(--color-focus);
+    outline-offset: var(--focus-offset);
+    border-radius: var(--radius-s);
+}
+
+/* Від 768 px: з'являється бічна панель, шапка стає рядком */
+@media (min-width: 48em) {
+    .page {
+        grid-template-columns: var(--aside-width) minmax(0, 1fr);
+        grid-template-rows: auto 1fr auto;
+        grid-template-areas:
+            "header header"
+            "aside  main"
+            "footer footer";
+    }
+
+    .header {
+        flex-direction: row;
+        align-items: center;
+    }
+
+    .nav {
+        flex: 1 1 auto;
+        width: auto;
+    }
+
+    .nav__list {
+        flex-direction: row;
+        justify-content: center;
+        gap: var(--gap-l);
+    }
+
+    .sidebar {
+        padding: var(--gap-l) var(--gap);
+        border-bottom: 0;
+        border-right: var(--border) solid var(--color-line);
+    }
+
+    .content {
+        padding: var(--gap-l) var(--gap-xl);
+    }
+
+    .footer {
+        flex-direction: row;
+        justify-content: space-between;
+        gap: var(--gap);
+    }
+}
+
+/* Від 1200 px: остаточний вигляд, ширина вмісту обмежена.
+   Шапка й підвал далі на всю ширину, бічні колонки — порожні поля. */
+@media (min-width: 75em) {
+    .page {
+        grid-template-columns:
+            minmax(0, 1fr)
+            var(--aside-width)
+            minmax(0, calc(var(--content-max) - var(--aside-width)))
+            minmax(0, 1fr);
+        grid-template-areas:
+            "header header header header"
+            ".      aside  main   ."
+            "footer footer footer footer";
+    }
+}
