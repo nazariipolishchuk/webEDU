@@ -228,7 +228,10 @@
     document.querySelector("#notice-undo").hidden = !canUndo;
     box.classList.add("notice--visible");
     clearTimeout(noticeTimer);
-    noticeTimer = setTimeout(() => box.classList.remove("notice--visible"), NOTICE_TIME);
+    noticeTimer = setTimeout(() => {
+      box.classList.remove("notice--visible");
+      document.querySelector("#notice-undo").hidden = true;
+    }, NOTICE_TIME);
   };
 
   App.render = { all, fieldError, focusInCard, notice, visibleItems };

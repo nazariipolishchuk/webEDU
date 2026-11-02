@@ -48,7 +48,7 @@
     --fs-base: 1rem;
     --fs-m: 1.25rem;
     --fs-l: 1.625rem;
-    --fs-stat: clamp(2rem, 1.6rem + 1.4vw, 2.75rem);
+    --fs-stat: 1.625rem;
     --fs-xl: clamp(2.25rem, 1.6rem + 2.6vw, 3.5rem);
     --line-height: 1.55;
     --line-height-lead: 1.5;
@@ -58,7 +58,7 @@
     --aside-width: 16rem;
     --content-max: 78rem;
     --page-inline: max(var(--gap), calc((100% - var(--content-max)) / 2));
-    --stat-min: 9rem;
+    --stat-min: 13rem;
     --card-min: 15rem;
     --field-min: 13rem;
     --notice-width: 32rem;
@@ -342,6 +342,7 @@
     font-weight: 700;
     line-height: var(--line-height-head);
     font-variant-numeric: lining-nums tabular-nums;
+    overflow-wrap: anywhere;
 }
 
 .stat__label {

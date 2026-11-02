@@ -172,12 +172,15 @@
   const removeItem = (state, id) => {
     const index = state.items.findIndex((item) => item.id === id);
     const item = state.items[index];
-    const { items } = state;
 
-    state.items = items.filter((other) => other.id !== id);
+    state.items = state.items.filter((other) => other.id !== id);
     if (state.editingId === id) state.editingId = null;
     commit(state);
-    offerUndo(state, `Deleted “${item.title}”.`, () => { state.items = items; });
+
+    // Put back only this element: other cards may have changed since the delete
+    offerUndo(state, `Deleted “${item.title}”.`, () => {
+      state.items = [...state.items.slice(0, index), item, ...state.items.slice(index)];
+    });
   };
 
   const exportSelected = (state) => {
@@ -317,6 +320,8 @@
       if (event.key === "Escape") {
         stopEdit(state, card.dataset.id);
       } else if (event.key === "Enter" && event.target.matches("input")) {
+        // Saving moves the focus to the Edit button: this Enter must not press it
+        event.preventDefault();
         saveEdit(state, card);
       }
     });
