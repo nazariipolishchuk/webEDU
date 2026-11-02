@@ -2,8 +2,23 @@
 
 const BASE_URL = "https://jsonplaceholder.typicode.com";
 
+// The Server list on the page: the real API and two ways for it to fail, to check the error state
+const SERVERS = {
+  working: BASE_URL,
+  missing: `${BASE_URL}/no-such-path`,
+  unreachable: "https://jsonplaceholder.invalid",
+};
+
 export const PAGE_SIZE = 10;
 const TIME_LIMIT = 5000;
+const RETRIES = 3;
+const RETRY_DELAY = 500;
+
+// Repeating these does not change the result. A repeated POST could create a duplicate record.
+const IDEMPOTENT = new Set(["GET", "HEAD", "OPTIONS", "PUT", "DELETE"]);
+
+let server = SERVERS.working;
+export const useServer = (name) => { server = SERVERS[name]; };
 
 // HTTP/2 responses carry no reason phrase, so response.statusText is empty there
 const STATUS_TEXT = {
@@ -64,18 +79,51 @@ const limited = (signal) => {
   return signal ? AbortSignal.any([signal, timeout]) : timeout;
 };
 
+// A network failure, an overloaded server or a rate limit can pass, 404 will not.
+// A timeout is not repeated either: it goes straight to the error state with its Retry button.
+const isTemporary = (error) =>
+  error instanceof TypeError || (error instanceof ApiError && (error.status === 429 || error.status >= 500));
+
+const pause = (ms, signal) => new Promise((resolve, reject) => {
+  if (signal?.aborted) {
+    reject(signal.reason);
+    return;
+  }
+  const timerId = setTimeout(resolve, ms);
+  signal?.addEventListener("abort", () => {
+    clearTimeout(timerId);
+    reject(signal.reason);
+  }, { once: true });
+});
+
+// Up to 3 repeats after the first request, waiting 0.5, 1 and 2 seconds. Each attempt has its own time limit.
+export async function requestWithRetry(url, { signal, onRetry, ...options } = {}) {
+  const retries = IDEMPOTENT.has(options.method ?? "GET") ? RETRIES : 0;
+
+  for (let attempt = 1; ; attempt++) {
+    try {
+      return await request(url, { ...options, signal: limited(signal) });
+    } catch (error) {
+      if (attempt > retries || !isTemporary(error)) throw error;
+      const delay = RETRY_DELAY * 2 ** (attempt - 1);
+      onRetry?.({ attempt, retries, delay, error });
+      await pause(delay, signal);
+    }
+  }
+}
+
 const addressOf = (path, params = {}) => {
-  const address = new URL(BASE_URL + path);
+  const address = new URL(server + path);
   for (const [name, value] of Object.entries(params)) {
     if (value !== undefined && value !== "") address.searchParams.set(name, value);
   }
   return address.href;
 };
 
-export const getPosts = ({ query, userId, page = 1, limit = PAGE_SIZE, signal } = {}) =>
-  request(addressOf("/posts", { q: query, userId, _page: page, _limit: limit }), { signal: limited(signal) });
+export const getPosts = ({ query, userId, page = 1, limit = PAGE_SIZE, signal, onRetry } = {}) =>
+  requestWithRetry(addressOf("/posts", { q: query, userId, _page: page, _limit: limit }), { signal, onRetry });
 
-export const getUsers = ({ signal } = {}) => request(addressOf("/users"), { signal: limited(signal) });
+export const getUsers = ({ signal } = {}) => requestWithRetry(addressOf("/users"), { signal });
 
 // A sentence for the error state. The code of the answer stays in it.
 export const explain = (error) => {

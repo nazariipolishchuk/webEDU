@@ -1,5 +1,5 @@
 // js/app.js: the application logic. Keeps the state, runs requests, decides which state to show.
-import { explain, getPosts, getUsers, PAGE_SIZE } from "./api.js";
+import { explain, getPosts, getUsers, PAGE_SIZE, useServer } from "./api.js";
 import * as view from "./api-view.js";
 import { debounce } from "./utils.js";
 
@@ -35,9 +35,12 @@ const matchesTitle = (post) => post.title.toLowerCase().includes(state.query.toL
 // ?q= looks through all fields of a post, so the title is checked here as well.
 // A page can hold no title matches while later pages do, so the search walks on until it finds some.
 const fetchMatching = async (startPage, limit, signal) => {
+  const onRetry = ({ attempt, retries, delay }) => {
+    view.setLoadingText(`No connection. Repeat ${attempt} of ${retries} in ${delay / 1000} s…`);
+  };
   const found = [];
   for (let page = startPage; ; page++) {
-    const batch = await getPosts({ query: state.query, userId: state.userId, page, limit, signal });
+    const batch = await getPosts({ query: state.query, userId: state.userId, page, limit, signal, onRetry });
     found.push(...batch.filter(matchesTitle));
     const exhausted = batch.length < limit;  // judged by the server's answer, not by the matches
     if (exhausted || found.length > 0) return { found, page, hasMore: !exhausted };
@@ -109,6 +112,11 @@ const search = () => {
 const applySearch = debounce(search, SEARCH_DELAY);
 searchInput.addEventListener("input", applySearch);
 curatorSelect.addEventListener("change", search);
+
+document.querySelector("#server").addEventListener("change", (event) => {
+  useServer(event.target.value);
+  load("new");
+});
 
 document.querySelector("#controls").addEventListener("submit", (event) => {
   event.preventDefault();  // Enter searches at once
