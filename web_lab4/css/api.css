@@ -277,3 +277,99 @@
 .toolbar .field__control {
     min-height: 2.25rem;
 }
+
+/* Network checks page */
+.check {
+    margin-bottom: var(--gap-xl);
+}
+
+.check__text {
+    max-width: var(--measure);
+    margin: 0 0 var(--gap);
+}
+
+.check__buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--gap-s);
+}
+
+.check__status {
+    min-height: 1.5em;
+    margin: var(--gap-s) 0 0;
+    color: var(--color-muted);
+    font-size: var(--fs-s);
+}
+
+.table-wrap {
+    overflow-x: auto;
+}
+
+.results {
+    width: 100%;
+    margin-top: var(--gap-s);
+    border-collapse: collapse;
+    background: var(--color-surface);
+    font-variant-numeric: lining-nums tabular-nums;
+}
+
+.results__caption {
+    padding-block: var(--gap-xs);
+    color: var(--color-muted);
+    font-size: var(--fs-s);
+    text-align: left;
+}
+
+.results__head,
+.results__cell {
+    padding: var(--gap-xs) var(--gap-s);
+    border-bottom: var(--border) solid var(--color-line);
+    text-align: left;
+    vertical-align: top;
+}
+
+.results__head {
+    color: var(--color-heading);
+    font-size: var(--fs-s);
+}
+
+.results__head--number,
+.results__cell--number {
+    text-align: right;
+}
+
+.results__total {
+    font-weight: 700;
+}
+
+.log {
+    margin: var(--gap) 0 0;
+    padding: 0;
+    list-style: none;
+}
+
+.log__entry {
+    padding: var(--gap-s) var(--gap);
+    border-left: var(--rule) solid var(--color-ready);
+    background: var(--color-surface);
+}
+
+.log__entry + .log__entry {
+    margin-top: var(--gap-s);
+}
+
+.log__entry--failed {
+    border-left-color: var(--color-danger);
+}
+
+.log__title {
+    margin: 0;
+    color: var(--color-heading);
+    font-weight: 700;
+}
+
+.log__text {
+    margin: 0;
+    font-size: var(--fs-s);
+    overflow-wrap: anywhere;
+}

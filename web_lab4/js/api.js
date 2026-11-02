@@ -1,6 +1,6 @@
 // js/api.js: everything that talks to the REST API. Knows nothing about the page.
 
-const BASE_URL = "https://jsonplaceholder.typicode.com";
+export const BASE_URL = "https://jsonplaceholder.typicode.com";
 
 // The Server list on the page: the real API and two ways for it to fail, to check the error state
 const SERVERS = {
