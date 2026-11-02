@@ -570,6 +570,66 @@
     line-height: var(--line-height-head);
 }
 
+.card--selected {
+    outline: var(--bar) solid var(--color-ready);
+    outline-offset: calc(var(--bar) * -1);
+}
+
+.card__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--gap-xs);
+    margin: 0 var(--gap);
+}
+
+.card__toggle {
+    flex: 1 1 100%;
+    display: flex;
+    align-items: center;
+    gap: var(--gap-s);
+    text-align: left;
+}
+
+.card__toggle::before {
+    content: "";
+    flex: none;
+    width: var(--dot);
+    height: var(--dot);
+    border: var(--border) solid currentColor;
+}
+
+.card__toggle--on {
+    border-color: var(--color-ready);
+    color: var(--color-heading);
+    font-weight: 700;
+}
+
+.card__toggle--on::before {
+    border-color: var(--color-ready);
+    background: var(--color-ready);
+}
+
+.card__edit {
+    flex: 1 1 auto;
+}
+
+.card__remove {
+    flex: 1 1 auto;
+    border-color: var(--color-danger);
+    color: var(--color-danger);
+}
+
+.card__save,
+.card__cancel {
+    flex: 1 1 auto;
+}
+
+.card__fields {
+    display: flex;
+    flex-direction: column;
+    margin: 0 var(--gap);
+}
+
 /* Footer */
 .footer {
     grid-area: footer;
@@ -705,6 +765,12 @@
 .card:hover::after,
 .card:focus-within::after {
     opacity: 1;
+}
+
+/* Fields should not move under the pointer while a card is edited */
+.card--editing:hover,
+.card--editing:focus-within {
+    transform: none;
 }
 
 .nav__link::after {

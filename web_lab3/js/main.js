@@ -3,7 +3,7 @@
   "use strict";
 
   const { items, condition } = App.storage.load();
-  const state = { items };
+  const state = { items, editingId: null };
 
   if (condition !== "ok") App.storage.save(items);
   App.render.all(state);

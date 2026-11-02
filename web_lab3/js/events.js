@@ -111,8 +111,99 @@
     });
   };
 
+  const updateItem = (state, id, changes) => {
+    state.items = state.items.map((item) => (item.id === id ? { ...item, ...changes } : item));
+  };
+
+  const startEdit = (state, id) => {
+    state.editingId = id;
+    render.all(state);
+    render.focusInCard(id, ".field__control");
+  };
+
+  const stopEdit = (state, id) => {
+    state.editingId = null;
+    render.all(state);
+    render.focusInCard(id, ".card__edit");
+  };
+
+  const saveEdit = (state, card) => {
+    const fields = [...card.querySelectorAll(".field__control")];
+    if (!validateFields(fields, state.items)) return;
+
+    const value = (name) => fields.find((field) => field.name === name).value;
+    const { id } = card.dataset;
+    const title = value("title").trim();
+
+    updateItem(state, id, {
+      title,
+      quantity: Number(value("quantity")),
+      price: toKopiykas(value("price")),
+      status: value("status"),
+    });
+    state.editingId = null;
+    commit(state);
+    render.focusInCard(id, ".card__edit");
+    render.notice(`Saved changes to “${title}”.`);
+  };
+
+  const removeItem = (state, id) => {
+    const item = state.items.find((other) => other.id === id);
+    state.items = state.items.filter((other) => other.id !== id);
+    if (state.editingId === id) state.editingId = null;
+    commit(state);
+    render.notice(`Deleted “${item.title}”.`);
+  };
+
+  const bindList = (state) => {
+    const list = document.querySelector("#dataset-list");
+
+    // Event delegation: this one handler serves every button of every card,
+    // including the cards created after it was attached
+    list.addEventListener("click", (event) => {
+      const button = event.target.closest("button");
+      if (!button) return;
+
+      const card = button.closest(".card");
+      if (!card) return;
+      const { id } = card.dataset;
+
+      if (button.matches(".card__toggle")) {
+        const item = state.items.find((other) => other.id === id);
+        updateItem(state, id, { selected: !item.selected });
+        commit(state);
+        render.focusInCard(id, ".card__toggle");
+      } else if (button.matches(".card__edit")) {
+        startEdit(state, id);
+      } else if (button.matches(".card__save")) {
+        saveEdit(state, card);
+      } else if (button.matches(".card__cancel")) {
+        stopEdit(state, id);
+      } else if (button.matches(".card__remove")) {
+        removeItem(state, id);
+      }
+    });
+
+    // Keyboard in the open card: Enter saves, Escape cancels
+    list.addEventListener("keydown", (event) => {
+      const card = event.target.closest(".card--editing");
+      if (!card) return;
+
+      if (event.key === "Escape") {
+        stopEdit(state, card.dataset.id);
+      } else if (event.key === "Enter" && event.target.matches("input")) {
+        saveEdit(state, card);
+      }
+    });
+
+    list.addEventListener("input", (event) => {
+      if (event.target.hasAttribute("aria-invalid")) validateField(event.target, state.items);
+    });
+  };
+
   const bind = (state) => {
     bindForm(state);
+    bindList(state);
   };
 
   App.events = { bind };
