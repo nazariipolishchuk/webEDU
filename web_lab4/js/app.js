@@ -1,5 +1,5 @@
 // js/app.js: the application logic. Keeps the state, runs requests, decides which state to show.
-import { explain, getPosts, getUsers, PAGE_SIZE, useServer } from "./api.js";
+import { explain, getComments, getCurator, getPosts, getUsers, PAGE_SIZE, useServer } from "./api.js";
 import * as view from "./api-view.js";
 import { debounce } from "./utils.js";
 
@@ -19,6 +19,7 @@ const state = {
 
 let controller = null;   // cancels the request in progress
 let lastMode = "new";    // what the Retry button repeats
+let detailController = null;  // cancels the requests of the dialog
 
 const showResult = () => {
   view.setPaging({ hasMore: state.hasMore, count: state.posts.length });
@@ -109,6 +110,38 @@ const search = () => {
   load("new");
 };
 
+const showCuratorPosts = (userId) => {
+  view.closePublication();
+  searchInput.value = "";
+  curatorSelect.value = userId;
+  search();
+};
+
+// The curator and the comments do not depend on each other: if one fails, the other is still shown
+async function loadDetails(post) {
+  detailController?.abort();
+  detailController = new AbortController();
+  const { signal } = detailController;
+  const retry = () => loadDetails(post);
+
+  view.detailsLoading();
+  const [curator, comments] = await Promise.allSettled([
+    getCurator(post.userId, { signal }),
+    getComments(post.id, { signal }),
+  ]);
+  if (signal.aborted) return;                // the dialog was closed or another publication was opened
+
+  if (curator.status === "fulfilled") {
+    const onShowAll = state.users.has(post.userId) ? () => showCuratorPosts(post.userId) : null;
+    view.renderCurator(curator.value, onShowAll);
+  } else {
+    view.curatorError(explain(curator.reason), retry);
+  }
+
+  if (comments.status === "fulfilled") view.renderComments(comments.value);
+  else view.commentsError(explain(comments.reason), retry);
+}
+
 const applySearch = debounce(search, SEARCH_DELAY);
 searchInput.addEventListener("input", applySearch);
 curatorSelect.addEventListener("change", search);
@@ -129,6 +162,22 @@ document.querySelector("#clear-search").addEventListener("click", () => {
   search();
   searchInput.focus();
 });
+
+// Event delegation as in lab 3: one handler for all the cards, present and future
+document.querySelector("#publication-list").addEventListener("click", (event) => {
+  const card = event.target.closest(".card__open")?.closest(".card");
+  if (!card) return;
+  const post = state.posts.find(({ id }) => String(id) === card.dataset.id);
+  view.openPublication(post);
+  loadDetails(post);
+});
+
+const dialog = document.querySelector("#publication");
+document.querySelector("#publication-close").addEventListener("click", () => dialog.close());
+dialog.addEventListener("click", (event) => {
+  if (event.target === dialog) dialog.close();  // a click on the backdrop
+});
+dialog.addEventListener("close", () => detailController?.abort());
 
 document.querySelector("#show-more").addEventListener("click", () => load("more"));
 document.querySelector("#retry").addEventListener("click", () => load(lastMode));

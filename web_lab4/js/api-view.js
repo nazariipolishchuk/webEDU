@@ -107,3 +107,82 @@ export const fillCurators = (users, selected) => {
   select.replaceChildren(new Option("All curators", ""), ...[...users.values()].map((user) => new Option(user.name, user.id)));
   select.value = selected;
 };
+
+// ---------- The publication dialog ----------
+
+const dialog = $("#publication");
+const curatorBox = $("#curator-box");
+const commentsBox = $("#comments-box");
+
+const boxLoading = (box, text) => {
+  box.replaceChildren(createEl("p", "box__message", text));
+};
+
+const boxError = (box, text, onRetry) => {
+  const retry = createButton("action", "Retry");
+  retry.addEventListener("click", onRetry);
+  box.replaceChildren(createEl("p", "box__message box__message--error", text), retry);
+};
+
+const createFact = (name, value) => {
+  const row = createEl("div", "facts__row");
+  row.append(createEl("dt", "facts__name", name), createEl("dd", "facts__value", value));
+  return row;
+};
+
+export const openPublication = (post) => {
+  $("#publication-type").textContent = scanTypeOf(post).label;
+  $("#publication-title").textContent = post.title;
+  $("#publication-code").textContent = codeOf(post);
+  $("#publication-body").textContent = post.body;
+  dialog.showModal();
+};
+
+export const closePublication = () => dialog.close();
+
+export const detailsLoading = () => {
+  boxLoading(curatorBox, "Loading the curator…");
+  boxLoading(commentsBox, "Loading comments…");
+};
+
+export const renderCurator = ({ user, posts, albums }, onShowAll) => {
+  const facts = createEl("dl", "facts");
+  facts.append(
+    createFact("Username", user.username),
+    createFact("Email", user.email),
+    createFact("City", user.address.city),
+    createFact("Company", user.company.name),
+    createFact("Website", user.website),
+    createFact("Publications", String(posts.length)),
+    createFact("Albums", String(albums.length)),
+  );
+
+  const nodes = [createEl("p", "curator__name", user.name), facts];
+  if (onShowAll) {
+    const showAll = createButton("action", "Show this curator's publications");
+    showAll.addEventListener("click", onShowAll);
+    nodes.push(showAll);
+  }
+  curatorBox.replaceChildren(...nodes);
+};
+
+export const renderComments = (comments) => {
+  if (comments.length === 0) {
+    boxLoading(commentsBox, "No comments on this publication yet.");
+    return;
+  }
+  const items = createEl("ul", "comments");
+  items.append(...comments.map((comment) => {
+    const item = createEl("li", "comment");
+    item.append(
+      createEl("p", "comment__title", comment.name),
+      createEl("p", "comment__author", comment.email),
+      createEl("p", "comment__text", comment.body),
+    );
+    return item;
+  }));
+  commentsBox.replaceChildren(items);
+};
+
+export const curatorError = (text, onRetry) => boxError(curatorBox, text, onRetry);
+export const commentsError = (text, onRetry) => boxError(commentsBox, text, onRetry);

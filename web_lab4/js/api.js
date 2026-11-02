@@ -125,6 +125,20 @@ export const getPosts = ({ query, userId, page = 1, limit = PAGE_SIZE, signal, o
 
 export const getUsers = ({ signal } = {}) => requestWithRetry(addressOf("/users"), { signal });
 
+export const getComments = (postId, { signal } = {}) =>
+  requestWithRetry(addressOf(`/posts/${postId}/comments`), { signal });
+
+// The curator's card needs all three independent resources, so one failure fails the card.
+// They start together: the wait is the slowest of them, not the sum.
+export const getCurator = async (userId, { signal } = {}) => {
+  const [user, posts, albums] = await Promise.all([
+    requestWithRetry(addressOf(`/users/${userId}`), { signal }),
+    requestWithRetry(addressOf("/posts", { userId }), { signal }),
+    requestWithRetry(addressOf("/albums", { userId }), { signal }),
+  ]);
+  return { user, posts, albums };
+};
+
 // A sentence for the error state. The code of the answer stays in it.
 export const explain = (error) => {
   if (error.name === "TimeoutError") return `The server did not answer within ${TIME_LIMIT / 1000} seconds. The waiting time is over.`;

@@ -122,6 +122,28 @@
             <p class="more__end" id="all-loaded" hidden>All matching publications are shown.</p>
         </div>
     </section>
+
+    <dialog class="publication" id="publication" aria-labelledby="publication-title">
+        <div class="publication__head">
+            <div class="publication__heading">
+                <p class="publication__type" id="publication-type"></p>
+                <h2 class="publication__title" id="publication-title"></h2>
+                <p class="publication__code" id="publication-code"></p>
+            </div>
+            <button class="action" id="publication-close" type="button">Close</button>
+        </div>
+        <p class="publication__body" id="publication-body"></p>
+        <div class="publication__parts">
+            <section class="box" aria-labelledby="curator-title">
+                <h3 class="section-title" id="curator-title">Curator</h3>
+                <div id="curator-box" aria-live="polite"></div>
+            </section>
+            <section class="box" aria-labelledby="comments-title">
+                <h3 class="section-title" id="comments-title">Comments</h3>
+                <div id="comments-box" aria-live="polite"></div>
+            </section>
+        </div>
+    </dialog>
 </main>
 
 <footer class="footer">
