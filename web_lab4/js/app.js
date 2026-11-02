@@ -64,6 +64,16 @@ const MODES = {
     state.hasMore = posts.value.hasMore;
     view.renderPosts(state.posts, state.users);
   },
+
+  // The next page goes to the end of the list
+  more: async (signal) => {
+    const { found, page, hasMore } = await fetchMatching(state.page + 1, PAGE_SIZE, signal);
+    state.posts.push(...found);
+    state.page = page;
+    state.hasMore = hasMore;
+    view.appendPosts(found, state.users, state.posts.length);
+    if (found.length > 0) view.focusCard(found[0].id);
+  },
 };
 
 async function load(mode) {
@@ -72,16 +82,17 @@ async function load(mode) {
   const { signal } = controller;
   lastMode = mode;
 
-  view.hidePaging();
-  view.setLoadingText("Loading publications…");
-  view.showState("loading");
+  const keepList = mode !== "new";
+  if (!keepList) view.hidePaging();
+  view.setLoadingText(keepList ? "Loading more publications…" : "Loading publications…");
+  view.showState("loading", { keepList });
 
   try {
     await MODES[mode](signal);
     showResult();
   } catch (error) {
     if (error.name === "AbortError") return; // cancelled by a newer request: not a failure
-    view.setError(explain(error));
+    view.setError(explain(error), mode === "more" ? `Show the ${state.posts.length} loaded publications` : "");
     view.showState("error");
   }
 }
@@ -111,7 +122,11 @@ document.querySelector("#clear-search").addEventListener("click", () => {
   searchInput.focus();
 });
 
+document.querySelector("#show-more").addEventListener("click", () => load("more"));
 document.querySelector("#retry").addEventListener("click", () => load(lastMode));
 document.querySelector("#refresh").addEventListener("click", () => load("new"));
+
+// What Retry cannot bring back yet is still in memory: the list loaded before the failure
+document.querySelector("#show-kept").addEventListener("click", showResult);
 
 load("new");
