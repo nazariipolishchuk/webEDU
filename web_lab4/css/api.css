@@ -19,6 +19,11 @@
     background: var(--color-surface);
 }
 
+/* The cards arrive later, so their place is kept and the footer does not jump */
+.catalog--remote {
+    min-height: 120vh;
+}
+
 .source {
     min-height: 1.5em;
     margin: 0 0 var(--gap);
