@@ -16,6 +16,7 @@
   const valueOf = (item) => item.quantity * item.price;
   const totalValue = (items) => items.reduce((sum, item) => sum + valueOf(item), 0);
 
+  const NOTICE_TIME = 8000;
   const listNode = document.querySelector("#dataset-list");
 
   const createEl = (tag, className, text = "") => {
@@ -87,5 +88,21 @@
     summary(state);
   };
 
-  App.render = { all };
+  const fieldError = (field, message) => {
+    field.closest(".field").querySelector(".field__error").textContent = message;
+    if (message) field.setAttribute("aria-invalid", "true");
+    else field.removeAttribute("aria-invalid");
+  };
+
+  let noticeTimer;
+
+  const notice = (text) => {
+    const box = document.querySelector("#notice");
+    document.querySelector("#notice-text").textContent = text;
+    box.classList.add("notice--visible");
+    clearTimeout(noticeTimer);
+    noticeTimer = setTimeout(() => box.classList.remove("notice--visible"), NOTICE_TIME);
+  };
+
+  App.render = { all, fieldError, notice };
 })(window.App);

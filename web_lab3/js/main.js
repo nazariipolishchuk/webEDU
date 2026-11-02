@@ -7,4 +7,5 @@
 
   if (condition !== "ok") App.storage.save(items);
   App.render.all(state);
+  App.events.bind(state);
 })(window.App);
