@@ -7,6 +7,16 @@
 | ЛР 1   | –     | `web_lab1` | Засоби побудови веб-сторінок                |
 | ЛР 2   | lab02 | `web_lab2` | Flexbox, Grid, адаптивна верстка            |
 | ЛР 3   | lab03 | `web_lab3` | JavaScript: основи мови, DOM і події        |
+| ЛР 4   | lab04 | `web_lab4` | Асинхронний JavaScript, Fetch API, REST API |
 
 ЛР 3 відкривається без сервера: `web_lab3/index.html` (каталог),
 `web_lab3/tasks.html` (власні реалізації), `web_lab3/strict.html` (строгий режим).
+
+ЛР 4 відкривається лише через локальний HTTP-сервер:
+
+```
+cd web_lab4
+python -m http.server 8080
+```
+
+`http://localhost:8080/api.html` (публікації), `http://localhost:8080/network.html` (заміри та CORS).
