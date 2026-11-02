@@ -11,15 +11,16 @@
     review: "In review",
   };
 
+  // Scan type: the image file name and its text alternative
   const MODALITIES = {
-    "chest-xray": { label: "Chest X-ray", alt: "Chest X-ray with a box drawn around consolidation in the right lower lobe" },
-    "brain-mri": { label: "Brain MRI", alt: "Axial brain MRI slice with a glioma outlined" },
-    ecg: { label: "ECG", alt: "ECG strip with irregular beats marked as atrial fibrillation" },
-    dermatoscopy: { label: "Dermatoscopy", alt: "Dermatoscopy image of a mole with an irregular border outlined" },
-    histology: { label: "Histology", alt: "H&E stained tissue with a region of invasive carcinoma outlined" },
-    fundus: { label: "Retina", alt: "Retinal photo with haemorrhages and exudates boxed" },
-    "lung-ct": { label: "Lung CT", alt: "Lung CT slice with a six millimetre nodule circled" },
-    "bone-xray": { label: "Bone X-ray", alt: "Wrist X-ray with a distal radius fracture boxed" },
+    "chest-xray": "Chest X-ray with a box drawn around consolidation in the right lower lobe",
+    "brain-mri": "Axial brain MRI slice with a glioma outlined",
+    ecg: "ECG strip with irregular beats marked as atrial fibrillation",
+    dermatoscopy: "Dermatoscopy image of a mole with an irregular border outlined",
+    histology: "H&E stained tissue with a region of invasive carcinoma outlined",
+    fundus: "Retinal photo with haemorrhages and exudates boxed",
+    "lung-ct": "Lung CT slice with a six millimetre nodule circled",
+    "bone-xray": "Wrist X-ray with a distal radius fracture boxed",
   };
 
   // Prices are whole kopiykas: 0.1 + 0.2 !== 0.3 must not reach the totals

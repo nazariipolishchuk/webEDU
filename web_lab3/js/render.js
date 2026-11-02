@@ -35,7 +35,7 @@
   const createImage = ({ modality }) => {
     const image = createEl("img", "card__image");
     image.src = `img/${modality}.webp`;
-    image.alt = MODALITIES[modality].alt;
+    image.alt = MODALITIES[modality];
     image.width = 640;
     image.height = 400;
     image.loading = "lazy";
@@ -234,5 +234,5 @@
     }, NOTICE_TIME);
   };
 
-  App.render = { all, fieldError, focusInCard, notice, visibleItems };
+  App.render = { all, fieldError, focusInCard, notice };
 })(window.App);
