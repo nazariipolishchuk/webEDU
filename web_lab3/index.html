@@ -73,6 +73,11 @@
                 <span class="stat__note" id="stat-selected-note"></span>
             </li>
             <li class="stat">
+                <span class="stat__value" id="stat-shown"></span>
+                <span class="stat__label">shown by the filters</span>
+                <span class="stat__note" id="stat-shown-note"></span>
+            </li>
+            <li class="stat">
                 <span class="stat__value" id="stat-value"></span>
                 <span class="stat__label">total value</span>
                 <span class="stat__note" id="stat-value-note"></span>
@@ -141,6 +146,40 @@
 
     <section class="catalog" id="datasets" aria-labelledby="datasets-title">
         <h2 class="section-title" id="datasets-title">Datasets</h2>
+        <div class="toolbar">
+            <div class="field toolbar__search">
+                <label class="field__label" for="search">Search by name</label>
+                <input class="field__control" id="search" type="search" autocomplete="off">
+            </div>
+            <div class="field">
+                <label class="field__label" for="filter-status">Status</label>
+                <select class="field__control" id="filter-status">
+                    <option value="all">All statuses</option>
+                    <option value="ready">Ready for training</option>
+                    <option value="collecting">Collecting</option>
+                    <option value="review">In review</option>
+                </select>
+            </div>
+            <div class="field">
+                <label class="field__label" for="filter-selection">Selection</label>
+                <select class="field__control" id="filter-selection">
+                    <option value="all">All datasets</option>
+                    <option value="selected">Selected for training</option>
+                    <option value="not-selected">Not selected</option>
+                </select>
+            </div>
+            <div class="field">
+                <label class="field__label" for="sort">Sort by</label>
+                <select class="field__control" id="sort">
+                    <option value="title-asc">Name, A to Z</option>
+                    <option value="title-desc">Name, Z to A</option>
+                    <option value="price-asc">Price, low to high</option>
+                    <option value="price-desc">Price, high to low</option>
+                    <option value="quantity-desc">Most scans</option>
+                    <option value="value-desc">Highest value</option>
+                </select>
+            </div>
+        </div>
         <ul class="catalog__list" id="dataset-list"></ul>
     </section>
 

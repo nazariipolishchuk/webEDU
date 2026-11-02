@@ -132,6 +132,39 @@
     return card;
   };
 
+  const COMPARE = {
+    "title-asc": (a, b) => a.title.localeCompare(b.title),
+    "title-desc": (a, b) => b.title.localeCompare(a.title),
+    "price-asc": (a, b) => a.price - b.price,
+    "price-desc": (a, b) => b.price - a.price,
+    "quantity-desc": (a, b) => b.quantity - a.quantity,
+    "value-desc": (a, b) => valueOf(b) - valueOf(a),
+  };
+
+  const SELECTION = {
+    all: () => true,
+    selected: (item) => item.selected,
+    "not-selected": (item) => !item.selected,
+  };
+
+  const visibleItems = ({ items, view }) => {
+    const query = view.query.trim().toLowerCase();
+    const filtered = items.filter((item) =>
+      item.title.toLowerCase().includes(query)
+      && (view.status === "all" || item.status === view.status)
+      && SELECTION[view.selection](item));
+    return [...filtered].sort(COMPARE[view.sort]); // a copy: state.items keeps its order
+  };
+
+  const createEmpty = () => {
+    const empty = createEl("li", "catalog__empty");
+    empty.append(
+      createEl("p", "catalog__message", "No datasets match the search and filters."),
+      createButton("action catalog__reset", "Show all datasets"),
+    );
+    return empty;
+  };
+
   const list = (state) => {
     // The card being edited is reused, so typed values survive a redraw of the list
     const open = listNode.querySelector(".card--editing");
@@ -141,7 +174,8 @@
     };
 
     const fragment = document.createDocumentFragment();
-    fragment.append(...state.items.map(build));
+    const items = visibleItems(state);
+    fragment.append(...(items.length > 0 ? items.map(build) : [createEmpty(state)]));
     listNode.replaceChildren(fragment);
   };
 
@@ -163,6 +197,9 @@
 
     const selected = state.items.filter((item) => item.selected);
     setStat("selected", number(selected.length), `worth ${money(totalValue(selected))}`);
+
+    const shown = visibleItems(state);
+    setStat("shown", number(shown.length), `worth ${money(totalValue(shown))}`);
   };
 
   const all = (state) => {
@@ -186,5 +223,5 @@
     noticeTimer = setTimeout(() => box.classList.remove("notice--visible"), NOTICE_TIME);
   };
 
-  App.render = { all, fieldError, focusInCard, notice };
+  App.render = { all, fieldError, focusInCard, notice, visibleItems };
 })(window.App);

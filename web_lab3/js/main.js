@@ -3,7 +3,8 @@
   "use strict";
 
   const { items, condition } = App.storage.load();
-  const state = { items, editingId: null };
+  const view = { query: "", status: "all", selection: "all", sort: "title-asc" };
+  const state = { items, view, editingId: null };
 
   if (condition !== "ok") App.storage.save(items);
   App.render.all(state);

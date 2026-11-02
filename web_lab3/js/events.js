@@ -5,6 +5,16 @@
   const { storage, render } = App;
 
   const MIN_TITLE = 3;
+  const SEARCH_DELAY = 300;
+
+  // Runs fn only after the calls stop for delay ms
+  const debounce = (fn, delay) => {
+    let timerId;
+    return (...args) => {
+      clearTimeout(timerId);
+      timerId = setTimeout(() => fn(...args), delay);
+    };
+  };
 
   const MESSAGES = {
     title: {
@@ -155,6 +165,38 @@
     render.notice(`Deleted “${item.title}”.`);
   };
 
+  const VIEW_CONTROLS = {
+    status: document.querySelector("#filter-status"),
+    selection: document.querySelector("#filter-selection"),
+    sort: document.querySelector("#sort"),
+  };
+  const searchInput = document.querySelector("#search");
+
+  const resetView = (state) => {
+    searchInput.value = "";
+    state.view.query = "";
+    state.view.status = "all";
+    state.view.selection = "all";
+    Object.entries(VIEW_CONTROLS).forEach(([name, control]) => { control.value = state.view[name]; });
+    render.all(state);
+  };
+
+  const bindToolbar = (state) => {
+    const applySearch = debounce((value) => {
+      state.view.query = value;
+      render.all(state);
+    }, SEARCH_DELAY);
+
+    searchInput.addEventListener("input", (event) => applySearch(event.target.value));
+
+    Object.entries(VIEW_CONTROLS).forEach(([name, control]) => {
+      control.addEventListener("change", () => {
+        state.view[name] = control.value;
+        render.all(state);
+      });
+    });
+  };
+
   const bindList = (state) => {
     const list = document.querySelector("#dataset-list");
 
@@ -163,6 +205,11 @@
     list.addEventListener("click", (event) => {
       const button = event.target.closest("button");
       if (!button) return;
+
+      if (button.matches(".catalog__reset")) {
+        resetView(state);
+        return;
+      }
 
       const card = button.closest(".card");
       if (!card) return;
@@ -203,6 +250,7 @@
 
   const bind = (state) => {
     bindForm(state);
+    bindToolbar(state);
     bindList(state);
   };
 

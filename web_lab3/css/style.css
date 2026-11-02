@@ -467,6 +467,15 @@
     font-size: var(--fs-s);
 }
 
+/* Search, filters and sorting */
+.toolbar {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, var(--field-min)), 1fr));
+    align-items: end;
+    gap: var(--gap-s) var(--gap);
+    margin-bottom: var(--gap-l);
+}
+
 /* Datasets: responsive without media queries */
 .catalog__list {
     display: grid;
@@ -475,6 +484,19 @@
     margin: 0;
     padding: 0;
     list-style: none;
+}
+
+.catalog__empty {
+    grid-column: 1 / -1;
+    padding: var(--gap-l) var(--gap);
+    background: var(--color-surface);
+}
+
+.catalog__message {
+    margin: 0 0 var(--gap-s);
+    color: var(--color-heading);
+    font-family: var(--font-head);
+    font-size: var(--fs-m);
 }
 
 .card {
