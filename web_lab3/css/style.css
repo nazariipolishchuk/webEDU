@@ -416,12 +416,37 @@
     font-size: var(--fs-s);
 }
 
-.card__link {
+.card__code {
     margin: 0 var(--gap);
-    color: var(--color-link);
+    color: var(--color-muted);
+    font-size: var(--fs-xs);
     font-weight: 700;
-    text-decoration-thickness: var(--underline);
-    text-underline-offset: var(--gap-xs);
+    font-variant-numeric: tabular-nums;
+}
+
+/* The sum behind the value stays in sight: scans × price = value */
+.card__ledger {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0 var(--gap-s);
+    margin: 0 var(--gap);
+    padding-top: var(--gap-s);
+    border-top: var(--border) solid var(--color-line);
+    font-variant-numeric: lining-nums tabular-nums;
+}
+
+.card__sum {
+    color: var(--color-muted);
+    font-size: var(--fs-xs);
+}
+
+.card__value {
+    color: var(--color-heading);
+    font-family: var(--font-head);
+    font-size: var(--fs-m);
+    line-height: var(--line-height-head);
 }
 
 /* Footer */
@@ -438,6 +463,12 @@
 
 .footer__text {
     margin: 0;
+}
+
+.footer__link {
+    margin-right: var(--gap-s);
+    color: var(--color-masthead-ink);
+    font-weight: 700;
 }
 
 /* Single-column pages: language tasks and strict mode */
@@ -523,7 +554,7 @@
 .nav__link:focus-visible,
 .menu__link:focus-visible,
 .button:focus-visible,
-.card__link:focus-visible {
+.footer__link:focus-visible {
     outline: var(--focus-width) solid var(--color-focus);
     outline-offset: var(--focus-offset);
 }
