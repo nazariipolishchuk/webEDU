@@ -180,6 +180,37 @@
     offerUndo(state, `Deleted “${item.title}”.`, () => { state.items = items; });
   };
 
+  const exportSelected = (state) => {
+    const manifest = state.items
+      .filter((item) => item.selected)
+      .map(({ code, title, modality, quantity, price }) => ({ code, title, modality, scans: quantity, pricePerScan: price / 100 }));
+
+    if (manifest.length === 0) {
+      render.notice("Select at least one dataset to export.");
+      return;
+    }
+
+    const file = new Blob([JSON.stringify(manifest, null, 2)], { type: "application/json" });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(file);
+    link.download = "training-manifest.json";
+    link.click();
+    setTimeout(() => URL.revokeObjectURL(link.href), 0);
+    render.notice(`Exported ${manifest.length} datasets.`);
+  };
+
+  // A write to localStorage in one tab fires "storage" in the other tabs
+  const bindTabs = (state) => {
+    window.addEventListener("storage", (event) => {
+      if (event.key !== null && event.key !== storage.ITEMS_KEY) return;
+
+      state.items = event.newValue === null ? [] : storage.load().items;
+      if (!state.items.some((item) => item.id === state.editingId)) state.editingId = null;
+      render.all(state);
+      render.notice("The catalogue was changed in another tab.");
+    });
+  };
+
   const bindNotice = () => {
     document.querySelector("#notice-undo").addEventListener("click", () => {
       undoLast?.();
@@ -224,6 +255,8 @@
         render.all(state);
       });
     });
+
+    document.querySelector("#export-selected").addEventListener("click", () => exportSelected(state));
 
     document.querySelector("#clear-storage").addEventListener("click", () => {
       const { items } = state;
@@ -298,6 +331,7 @@
     bindToolbar(state);
     bindList(state);
     bindNotice();
+    bindTabs(state);
   };
 
   App.events = { bind };
