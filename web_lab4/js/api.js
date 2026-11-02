@@ -3,6 +3,7 @@
 const BASE_URL = "https://jsonplaceholder.typicode.com";
 
 export const PAGE_SIZE = 10;
+const TIME_LIMIT = 5000;
 
 // HTTP/2 responses carry no reason phrase, so response.statusText is empty there
 const STATUS_TEXT = {
@@ -56,6 +57,13 @@ export async function request(url, { method = "GET", body, signal, headers = {},
   }
 }
 
+// The controller's signal cancels on request, the timeout signal fires by itself.
+// fetch rejects with the reason of whichever fired first: AbortError or TimeoutError.
+const limited = (signal) => {
+  const timeout = AbortSignal.timeout(TIME_LIMIT);
+  return signal ? AbortSignal.any([signal, timeout]) : timeout;
+};
+
 const addressOf = (path, params = {}) => {
   const address = new URL(BASE_URL + path);
   for (const [name, value] of Object.entries(params)) {
@@ -65,12 +73,13 @@ const addressOf = (path, params = {}) => {
 };
 
 export const getPosts = ({ query, userId, page = 1, limit = PAGE_SIZE, signal } = {}) =>
-  request(addressOf("/posts", { q: query, userId, _page: page, _limit: limit }), { signal });
+  request(addressOf("/posts", { q: query, userId, _page: page, _limit: limit }), { signal: limited(signal) });
 
-export const getUsers = ({ signal } = {}) => request(addressOf("/users"), { signal });
+export const getUsers = ({ signal } = {}) => request(addressOf("/users"), { signal: limited(signal) });
 
 // A sentence for the error state. The code of the answer stays in it.
 export const explain = (error) => {
+  if (error.name === "TimeoutError") return `The server did not answer within ${TIME_LIMIT / 1000} seconds. The waiting time is over.`;
   if (error instanceof ApiError) return `The server answered with an error: ${error.message}.`;
   if (error instanceof TypeError) return "The server cannot be reached. Check the connection and try again.";
   return `The request failed: ${error.message}.`;
