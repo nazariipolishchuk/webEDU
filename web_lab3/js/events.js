@@ -58,6 +58,7 @@
   };
 
   const validateField = (field, items) => {
+    if (field.name === "code") field.value = field.value.trim().toUpperCase();
     field.setCustomValidity(""); // otherwise the previous custom error keeps the field invalid
     const flag = FLAGS.find((name) => field.validity[name]);
     const message = flag ? (MESSAGES[field.name]?.[flag] ?? field.validationMessage) : customMessage(field, items);
@@ -85,7 +86,6 @@
     form.addEventListener("submit", (event) => {
       event.preventDefault(); // the page must not reload
 
-      form.elements.code.value = form.elements.code.value.trim().toUpperCase();
       if (!validateFields(fields, state.items)) return;
 
       const data = new FormData(form);
