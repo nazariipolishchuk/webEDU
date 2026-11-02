@@ -1,0 +1,134 @@
+/* Publications page of lab 4. Colours, spacing and fonts are the variables of style.css. */
+
+:root {
+    --trace-width: 15rem;
+    --dialog-width: 56rem;
+    --dim: 0.55;
+    --sweep: 1.6s;
+}
+
+[hidden] {
+    display: none !important;
+}
+
+.file-warning {
+    max-width: var(--measure);
+    margin: 0 0 var(--gap-l);
+    padding: var(--gap-s) var(--gap);
+    border-left: var(--rule) solid var(--color-danger);
+    background: var(--color-surface);
+}
+
+.source {
+    min-height: 1.5em;
+    margin: 0 0 var(--gap);
+    color: var(--color-muted);
+    font-size: var(--fs-s);
+}
+
+.catalog__list[aria-busy="true"] {
+    opacity: var(--dim);
+}
+
+/* Loading, error and empty result: only one of them is ever visible */
+.state {
+    margin-top: var(--gap);
+    padding: var(--gap-l) var(--gap);
+    background: var(--color-surface);
+}
+
+.state--error {
+    border-left: var(--rule) solid var(--color-danger);
+}
+
+.state__title {
+    margin: 0 0 var(--gap-xs);
+    color: var(--color-heading);
+    font-family: var(--font-head);
+    font-size: var(--fs-m);
+    line-height: var(--line-height-head);
+}
+
+.state__text {
+    margin: 0;
+    color: var(--color-muted);
+}
+
+.state--error .state__text {
+    color: var(--color-danger);
+    font-weight: 600;
+}
+
+.state__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--gap-s);
+    margin-top: var(--gap);
+}
+
+/* The loading indicator is an ECG trace being drawn: the catalogue holds ECG datasets */
+.state__trace {
+    display: block;
+    width: var(--trace-width);
+    max-width: 100%;
+    height: auto;
+    margin-bottom: var(--gap-s);
+    overflow: visible;
+}
+
+.state__trace path {
+    fill: none;
+    stroke: var(--color-red-strong);
+    stroke-width: 2;
+    stroke-linejoin: round;
+    stroke-dasharray: 0.35 0.65;
+    animation: sweep var(--sweep) linear infinite;
+}
+
+@keyframes sweep {
+    from {
+        stroke-dashoffset: 1;
+    }
+
+    to {
+        stroke-dashoffset: 0;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .state__trace path {
+        stroke-dasharray: none;
+        animation: none;
+    }
+}
+
+.card__curator {
+    margin: 0 var(--gap);
+    padding-top: var(--gap-s);
+    border-top: var(--border) solid var(--color-line);
+    color: var(--color-ink);
+    font-size: var(--fs-s);
+}
+
+.card__actions--single {
+    margin: 0 var(--gap);
+}
+
+.card__clamp {
+    display: -webkit-box;
+    overflow: hidden;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
+}
+
+.more {
+    margin-top: var(--gap-l);
+    text-align: center;
+}
+
+.more__end {
+    margin: 0;
+    color: var(--color-muted);
+    font-size: var(--fs-s);
+}

@@ -68,3 +68,10 @@ export const getPosts = ({ query, userId, page = 1, limit = PAGE_SIZE, signal } 
   request(addressOf("/posts", { q: query, userId, _page: page, _limit: limit }), { signal });
 
 export const getUsers = ({ signal } = {}) => request(addressOf("/users"), { signal });
+
+// A sentence for the error state. The code of the answer stays in it.
+export const explain = (error) => {
+  if (error instanceof ApiError) return `The server answered with an error: ${error.message}.`;
+  if (error instanceof TypeError) return "The server cannot be reached. Check the connection and try again.";
+  return `The request failed: ${error.message}.`;
+};
