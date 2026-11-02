@@ -374,6 +374,11 @@
     color: var(--color-on-red);
 }
 
+.action--danger {
+    border-color: var(--color-danger);
+    color: var(--color-danger);
+}
+
 /* Add form */
 .editor {
     margin-bottom: var(--gap-xl);
@@ -467,6 +472,12 @@
     font-size: var(--fs-s);
 }
 
+.notice__undo {
+    flex: none;
+    border-color: var(--color-masthead-ink);
+    color: var(--color-masthead-ink);
+}
+
 /* Search, filters and sorting */
 .toolbar {
     display: grid;
@@ -474,6 +485,13 @@
     align-items: end;
     gap: var(--gap-s) var(--gap);
     margin-bottom: var(--gap-l);
+}
+
+.toolbar__actions {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--gap-s);
 }
 
 /* Datasets: responsive without media queries */

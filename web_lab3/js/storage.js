@@ -93,5 +93,17 @@
 
   const save = (items) => write(ITEMS_KEY, items);
 
-  App.storage = { ITEMS_KEY, MODALITIES, STATUSES, load, save, sample };
+  const loadView = () => {
+    const { value } = read(VIEW_KEY);
+    return value !== null && typeof value === "object" ? value : {};
+  };
+
+  const saveView = ({ status, selection, sort }) => write(VIEW_KEY, { status, selection, sort });
+
+  const clear = () => {
+    localStorage.removeItem(ITEMS_KEY);
+    localStorage.removeItem(VIEW_KEY);
+  };
+
+  App.storage = { ITEMS_KEY, MODALITIES, STATUSES, clear, load, loadView, sample, save, saveView };
 })(window.App = window.App || {});

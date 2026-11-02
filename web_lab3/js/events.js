@@ -157,12 +157,34 @@
     render.notice(`Saved changes to “${title}”.`);
   };
 
+  // Instead of asking "are you sure?" before a change, the change can be taken back
+  let undoLast = null;
+
+  const offerUndo = (state, text, restore) => {
+    undoLast = () => {
+      restore();
+      commit(state);
+      render.notice("Restored.");
+    };
+    render.notice(text, true);
+  };
+
   const removeItem = (state, id) => {
-    const item = state.items.find((other) => other.id === id);
-    state.items = state.items.filter((other) => other.id !== id);
+    const index = state.items.findIndex((item) => item.id === id);
+    const item = state.items[index];
+    const { items } = state;
+
+    state.items = items.filter((other) => other.id !== id);
     if (state.editingId === id) state.editingId = null;
     commit(state);
-    render.notice(`Deleted “${item.title}”.`);
+    offerUndo(state, `Deleted “${item.title}”.`, () => { state.items = items; });
+  };
+
+  const bindNotice = () => {
+    document.querySelector("#notice-undo").addEventListener("click", () => {
+      undoLast?.();
+      undoLast = null;
+    });
   };
 
   const VIEW_CONTROLS = {
@@ -178,6 +200,7 @@
     state.view.status = "all";
     state.view.selection = "all";
     Object.entries(VIEW_CONTROLS).forEach(([name, control]) => { control.value = state.view[name]; });
+    storage.saveView(state.view);
     render.all(state);
   };
 
@@ -190,10 +213,25 @@
     searchInput.addEventListener("input", (event) => applySearch(event.target.value));
 
     Object.entries(VIEW_CONTROLS).forEach(([name, control]) => {
+      // A value from the storage that is not among the options is ignored
+      control.value = state.view[name];
+      if (control.selectedIndex === -1) control.selectedIndex = 0;
+      state.view[name] = control.value;
+
       control.addEventListener("change", () => {
         state.view[name] = control.value;
+        storage.saveView(state.view);
         render.all(state);
       });
+    });
+
+    document.querySelector("#clear-storage").addEventListener("click", () => {
+      const { items } = state;
+      storage.clear();
+      state.items = [];
+      state.editingId = null;
+      render.all(state);
+      offerUndo(state, "Saved data cleared.", () => { state.items = items; });
     });
   };
 
@@ -208,6 +246,13 @@
 
       if (button.matches(".catalog__reset")) {
         resetView(state);
+        return;
+      }
+
+      if (button.matches(".catalog__sample")) {
+        state.items = storage.sample();
+        commit(state);
+        render.notice("Sample datasets loaded.");
         return;
       }
 
@@ -252,6 +297,7 @@
     bindForm(state);
     bindToolbar(state);
     bindList(state);
+    bindNotice();
   };
 
   App.events = { bind };

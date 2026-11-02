@@ -179,12 +179,16 @@
                     <option value="value-desc">Highest value</option>
                 </select>
             </div>
+            <div class="toolbar__actions">
+                <button class="action action--danger" id="clear-storage" type="button">Clear saved data</button>
+            </div>
         </div>
         <ul class="catalog__list" id="dataset-list"></ul>
     </section>
 
     <div class="notice" id="notice" role="status">
         <p class="notice__text" id="notice-text"></p>
+        <button class="action notice__undo" id="notice-undo" type="button" hidden>Undo</button>
     </div>
 </main>
 

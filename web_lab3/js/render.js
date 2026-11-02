@@ -156,8 +156,15 @@
     return [...filtered].sort(COMPARE[view.sort]); // a copy: state.items keeps its order
   };
 
-  const createEmpty = () => {
+  const createEmpty = (state) => {
     const empty = createEl("li", "catalog__empty");
+    if (state.items.length === 0) {
+      empty.append(
+        createEl("p", "catalog__message", "The catalogue is empty. Add a dataset with the form above, or load the samples."),
+        createButton("action catalog__sample", "Load sample datasets"),
+      );
+      return empty;
+    }
     empty.append(
       createEl("p", "catalog__message", "No datasets match the search and filters."),
       createButton("action catalog__reset", "Show all datasets"),
@@ -215,9 +222,10 @@
 
   let noticeTimer;
 
-  const notice = (text) => {
+  const notice = (text, canUndo = false) => {
     const box = document.querySelector("#notice");
     document.querySelector("#notice-text").textContent = text;
+    document.querySelector("#notice-undo").hidden = !canUndo;
     box.classList.add("notice--visible");
     clearTimeout(noticeTimer);
     noticeTimer = setTimeout(() => box.classList.remove("notice--visible"), NOTICE_TIME);
