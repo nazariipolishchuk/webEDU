@@ -21,7 +21,9 @@ const $ = (selector) => document.querySelector(selector);
 
 const list = $("#publication-list");
 const panels = { loading: $("#state-loading"), error: $("#state-error"), empty: $("#state-empty") };
-const busyControls = [$("#refresh"), $("#show-more"), $("#filter-curator"), $("#server")];
+const showMore = $("#show-more");
+const busyControls = [$("#refresh"), showMore, $("#filter-curator"), $("#server")];
+let focusBack = null;  // a control that lost the keyboard focus by being switched off
 
 const createImage = (post) => {
   const { key } = scanTypeOf(post);
@@ -78,11 +80,19 @@ export const showState = (state, { keepList = false } = {}) => {
   $("#publications").dataset.state = state;
 
   // The search field stays on: typing during a request is what cancels that request
-  busyControls.forEach((control) => { control.disabled = state === "loading"; });
+  const busy = state === "loading";
+  if (busy && busyControls.includes(document.activeElement) && document.activeElement !== showMore) {
+    focusBack = document.activeElement;
+  }
+  busyControls.forEach((control) => { control.disabled = busy; });
+  if (!busy) {
+    focusBack?.focus();
+    focusBack = null;
+  }
 };
 
 export const setPaging = ({ hasMore, count }) => {
-  $("#show-more").hidden = !hasMore;
+  showMore.hidden = !hasMore;
   $("#all-loaded").hidden = hasMore || count === 0;
 };
 
@@ -95,6 +105,8 @@ export const setError = (text, keptLabel = "") => {
   $("#show-kept").textContent = keptLabel;
   $("#show-kept").hidden = keptLabel === "";
 };
+
+export const focusRetry = () => $("#retry").focus();
 
 export const setEmpty = (query) => {
   $("#empty-title").textContent = query ? `No publications with “${query}” in the title` : "No publications found";

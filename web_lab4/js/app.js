@@ -1,6 +1,7 @@
 // js/app.js: the application logic. Keeps the state, runs requests, decides which state to show.
 import { explain, getComments, getCurator, getPosts, getUsers, PAGE_SIZE, useServer } from "./api.js";
 import * as view from "./api-view.js";
+import { describeAge, loadResult, saveResult } from "./cache.js";
 import { debounce } from "./utils.js";
 
 const SEARCH_DELAY = 400;
@@ -15,11 +16,16 @@ const state = {
   userId: "",
   page: 0,
   hasMore: false,
+  savedAt: 0,
 };
 
-let controller = null;   // cancels the request in progress
-let lastMode = "new";    // what the Retry button repeats
+let controller = null;        // cancels the request in progress
+let lastMode = "new";         // what the Retry button repeats
 let detailController = null;  // cancels the requests of the dialog
+let outdated = null;          // a saved copy too old to show at start, offered if the request fails
+let keptAction = null;        // what the second button of the error state does
+
+const ageOf = (savedAt) => describeAge(Date.now() - savedAt);
 
 const showResult = () => {
   view.setPaging({ hasMore: state.hasMore, count: state.posts.length });
@@ -53,21 +59,29 @@ const keepUsers = (users) => {
   view.fillCurators(state.users, state.userId);
 };
 
+// The list from the first page, as many pages as asked for in one request.
+// The curators are optional, so a failure there does not stop the list.
+const replaceList = async (pages, signal) => {
+  const hadUsers = state.users.size > 0;
+  const [posts, users] = await Promise.allSettled([
+    fetchMatching(1, PAGE_SIZE * pages, signal),
+    hadUsers ? null : getUsers({ signal }),
+  ]);
+  if (posts.status === "rejected") throw posts.reason;
+  if (!hadUsers && users.status === "fulfilled") keepUsers(users.value);
+
+  const { found, page, hasMore } = posts.value;
+  const changed = !hadUsers || JSON.stringify(found) !== JSON.stringify(state.posts);
+  state.posts = found;
+  state.page = page * pages;
+  state.hasMore = hasMore;
+  if (changed) view.renderPosts(state.posts, state.users); // the same data keeps the same nodes and focus
+};
+
 // Each mode only says what to request and where to put the answer
 const MODES = {
-  // A new list: the first page. The curators are optional, so a failure there does not stop the list.
-  new: async (signal) => {
-    const [posts, users] = await Promise.allSettled([
-      fetchMatching(1, PAGE_SIZE, signal),
-      state.users.size > 0 ? [...state.users.values()] : getUsers({ signal }),
-    ]);
-    if (posts.status === "rejected") throw posts.reason;
-    if (users.status === "fulfilled") keepUsers(users.value);
-    state.posts = posts.value.found;
-    state.page = posts.value.page;
-    state.hasMore = posts.value.hasMore;
-    view.renderPosts(state.posts, state.users);
-  },
+  new: (signal) => replaceList(1, signal),
+  refresh: (signal) => replaceList(state.page, signal),
 
   // The next page goes to the end of the list
   more: async (signal) => {
@@ -80,24 +94,78 @@ const MODES = {
   },
 };
 
+const LOADING_TEXT = {
+  new: "Loading publications…",
+  refresh: "Updating publications…",
+  more: "Loading more publications…",
+};
+
+const applySaved = (saved) => {
+  state.posts = saved.posts;
+  state.page = saved.page;
+  state.hasMore = saved.hasMore;
+  state.savedAt = saved.savedAt;
+  view.renderPosts(state.posts, state.users);
+};
+
+// What can still be shown when the request has failed
+const keptOption = (mode) => {
+  if (mode === "more") {
+    return { label: `Show the ${state.posts.length} loaded publications`, action: showResult };
+  }
+  if (outdated && outdated.query === state.query && outdated.userId === state.userId) {
+    const saved = outdated;
+    return {
+      label: `Show the saved copy from ${ageOf(saved.savedAt)}`,
+      action: () => {
+        applySaved(saved);
+        view.setSource(`Saved copy from ${ageOf(saved.savedAt)}. It is out of date.`);
+        showResult();
+      },
+    };
+  }
+  return null;
+};
+
 async function load(mode) {
   controller?.abort();                       // cancel the previous request
   controller = new AbortController();
   const { signal } = controller;
   lastMode = mode;
 
-  const keepList = mode !== "new";
-  if (!keepList) view.hidePaging();
-  view.setLoadingText(keepList ? "Loading more publications…" : "Loading publications…");
-  view.showState("loading", { keepList });
+  if (mode === "new") {
+    state.posts = [];
+    state.page = 0;
+    state.hasMore = false;
+    view.renderPosts(state.posts, state.users);
+    view.hidePaging();
+  }
+  view.setLoadingText(LOADING_TEXT[mode]);
+  view.showState("loading", { keepList: mode !== "new" });
 
   try {
     await MODES[mode](signal);
+    state.savedAt = Date.now();
+    outdated = null;
+    saveResult(state);
+    view.setSource(`Live data from the API, loaded at ${new Date().toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })}.`);
     showResult();
   } catch (error) {
     if (error.name === "AbortError") return; // cancelled by a newer request: not a failure
-    view.setError(explain(error), mode === "more" ? `Show the ${state.posts.length} loaded publications` : "");
+
+    // The list on the page is still good, so a failed update does not take it away
+    if (mode === "refresh" && state.posts.length > 0) {
+      view.setSource(`Could not update. ${explain(error)} Showing the copy from ${ageOf(state.savedAt)}.`);
+      showResult();
+      return;
+    }
+
+    const kept = keptOption(mode);
+    keptAction = kept?.action;
+    view.setSource("");
+    view.setError(explain(error), kept?.label);
     view.showState("error");
+    if (mode === "more") view.focusRetry();
   }
 }
 
@@ -181,9 +249,27 @@ dialog.addEventListener("close", () => detailController?.abort());
 
 document.querySelector("#show-more").addEventListener("click", () => load("more"));
 document.querySelector("#retry").addEventListener("click", () => load(lastMode));
-document.querySelector("#refresh").addEventListener("click", () => load("new"));
+document.querySelector("#refresh").addEventListener("click", () => load(state.posts.length > 0 ? "refresh" : "new"));
+document.querySelector("#show-kept").addEventListener("click", () => keptAction?.());
 
-// What Retry cannot bring back yet is still in memory: the list loaded before the failure
-document.querySelector("#show-kept").addEventListener("click", showResult);
+// Start: a fresh copy is shown at once and updated, an old one only stays in reserve
+const saved = loadResult();
+if (saved) {
+  state.query = saved.query;
+  state.userId = saved.userId;
+  searchInput.value = saved.query;
+  if (saved.users.length > 0) keepUsers(saved.users);
+}
 
-load("new");
+if (saved?.fresh) {
+  applySaved(saved);
+  view.setSource(`Saved copy from ${ageOf(saved.savedAt)}. Updating…`);
+  showResult();
+  load("refresh");
+} else {
+  if (saved) {
+    outdated = saved;
+    view.setSource(`The saved copy from ${ageOf(saved.savedAt)} is out of date, so the list is loaded again.`);
+  }
+  load("new");
+}
