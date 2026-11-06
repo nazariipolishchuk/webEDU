@@ -1,0 +1,67 @@
+@use "sass:meta";
+@use "../abstracts" as a;
+
+:root {
+  color-scheme: light;
+
+  @include a.custom-properties(a.$palette-light, color);
+
+  --gap: #{a.$gap};
+  --gap-xs: calc(var(--gap) / 4);
+  --gap-s: calc(var(--gap) / 2);
+  --gap-l: calc(var(--gap) * 1.5);
+  --gap-xl: calc(var(--gap) * 2.5);
+
+  --radius: 0;
+  --radius-s: 2px;
+  --border: 1px;
+  --rule: 4px;
+  --bar: 3px;
+  --underline: 2px;
+
+  // meta.inspect keeps the quotes of "Segoe UI", plain interpolation drops them
+  --font-body: #{meta.inspect(a.$font-body)};
+  --font-head: #{meta.inspect(a.$font-head)};
+  --fs-xs: #{a.font-size("xs")};
+  --fs-s: #{a.font-size("s")};
+  --fs-base: #{a.font-size("base")};
+  --fs-m: #{a.font-size("m")};
+  --fs-l: #{a.font-size("l")};
+  --fs-stat: #{a.font-size("stat")};
+  --fs-xl: clamp(2.25rem, 1.6rem + 2.6vw, 3.5rem);
+  --line-height: 1.55;
+  --line-height-lead: 1.5;
+  --line-height-head: 1.15;
+  --tracking-tight: -0.015em;
+
+  --aside-width: 16rem;
+  --content-max: 78rem;
+  --page-inline: max(var(--gap), calc((100% - var(--content-max)) / 2));
+  --stat-min: 13rem;
+  --card-min: 15rem;
+  --field-min: 13rem;
+  --notice-width: 32rem;
+  --count-min: 2rem;
+  --measure: 62ch;
+  --dot: #{a.rem(10)};
+  --focus-width: 3px;
+  --focus-offset: 2px;
+
+  --shadow: #{a.$shadow-light};
+  --lift: #{a.rem(-6)};
+  --nudge: #{a.rem(4)};
+  --hover-opacity: 0.85;
+  --duration: #{a.$duration};
+  --easing: #{a.$easing};
+}
+
+// Dark theme: only the variables change
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+
+    @include a.custom-properties(a.$palette-dark, color);
+
+    --shadow: #{a.$shadow-dark};
+  }
+}
