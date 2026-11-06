@@ -1,6 +1,9 @@
 // js/api.js: everything that talks to the REST API. Knows nothing about the page.
 
-export const BASE_URL = "https://jsonplaceholder.typicode.com";
+// From .env.development (/api, through the proxy of the dev server) or .env.production
+export const BASE_URL = import.meta.env.VITE_API_URL;
+// The public address of the same API: the CORS checks need a real cross-origin request
+export const REMOTE_URL = "https://jsonplaceholder.typicode.com";
 
 // The Server list on the page: the real API and two ways for it to fail, to check the error state
 const SERVERS = {
@@ -113,7 +116,8 @@ export async function requestWithRetry(url, { signal, onRetry, ...options } = {}
 }
 
 const addressOf = (path, params = {}) => {
-  const address = new URL(server + path);
+  // The base of a relative address (/api in development) is the page origin
+  const address = new URL(server + path, location.origin);
   for (const [name, value] of Object.entries(params)) {
     if (value !== undefined && value !== "") address.searchParams.set(name, value);
   }

@@ -1,6 +1,8 @@
 // js/network.js: the measurements and checks of network.html. Results go to the page, not to the console.
-import { BASE_URL, request } from "./api.js";
-import { createEl } from "./utils.js";
+import { BASE_URL, REMOTE_URL, request } from "./api.js";
+import { createEl, showApiAddress } from "./utils.js";
+
+showApiAddress();
 
 const RUNS = 5;
 const PATHS = ["/users/1", "/posts?userId=1", "/albums?userId=1"];
@@ -129,15 +131,16 @@ $("#errors").addEventListener("click", async (event) => {
 });
 
 // ---------- Cross-origin requests. Plain fetch: the headers are the point here. ----------
+// REMOTE_URL, not BASE_URL: in development BASE_URL is /api on the same origin, so CORS would not apply
 
 const CORS_CHECKS = {
   simple: {
     label: "GET /posts/1, no custom headers",
-    send: () => fetch(`${BASE_URL}/posts/1`, { cache: "no-store" }),
+    send: () => fetch(`${REMOTE_URL}/posts/1`, { cache: "no-store" }),
   },
   post: {
     label: "POST /posts, Content-Type: application/json",
-    send: () => fetch(`${BASE_URL}/posts`, {
+    send: () => fetch(`${REMOTE_URL}/posts`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ title: "New publication", body: "Text", userId: 1 }),
@@ -145,7 +148,7 @@ const CORS_CHECKS = {
   },
   header: {
     label: "GET /posts/1, X-Request-Id: lab-04",
-    send: () => fetch(`${BASE_URL}/posts/1`, { cache: "no-store", headers: { "X-Request-Id": "lab-04" } }),
+    send: () => fetch(`${REMOTE_URL}/posts/1`, { cache: "no-store", headers: { "X-Request-Id": "lab-04" } }),
   },
   blocked: {
     label: "GET https://example.com/",

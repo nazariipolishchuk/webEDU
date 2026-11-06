@@ -43,3 +43,9 @@ export const createButton = (className, text) => {
   button.type = "button";
   return button;
 };
+
+// The footer shows which API address this build talks to and the mode it was built in
+export const showApiAddress = () => {
+  document.querySelector("#api-url").textContent = import.meta.env.VITE_API_URL;
+  document.querySelector("#app-mode").textContent = import.meta.env.MODE;
+};

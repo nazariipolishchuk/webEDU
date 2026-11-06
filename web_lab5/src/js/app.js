@@ -2,7 +2,9 @@
 import { explain, getComments, getCurator, getPosts, getUsers, PAGE_SIZE, useServer } from "./api.js";
 import * as view from "./api-view.js";
 import { describeAge, loadResult, saveResult } from "./cache.js";
-import { debounce } from "./utils.js";
+import { debounce, showApiAddress } from "./utils.js";
+
+showApiAddress();
 
 const SEARCH_DELAY = 400;
 
