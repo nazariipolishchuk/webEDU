@@ -5,17 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="Dataset publications of DrAnnotation with their curators and reviewers' comments, loaded from an open REST API.">
     <title>DrAnnotation — dataset publications</title>
-    <link rel="icon" href="img/logo.svg" type="image/svg+xml">
-    <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="css/api.css">
-    <!-- Classic script of lab 3: gives App.storage.MODALITIES (alternative text of the scan images) -->
-    <script src="js/storage.js" defer></script>
+    <link rel="icon" href="assets/img/logo.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="styles/style.css">
+    <link rel="stylesheet" href="styles/api.css">
     <script type="module" src="js/app.js"></script>
 </head>
 <body class="page">
 <header class="header">
     <a class="logo" href="index.html" aria-label="DrAnnotation home">
-        <img class="logo__mark" src="img/logo.svg" alt="" width="40" height="40">
+        <img class="logo__mark" src="assets/img/logo.svg" alt="" width="40" height="40">
         <span class="logo__name">Dr</span><span class="logo__word">Annotation</span>
     </a>
 
@@ -56,8 +54,8 @@
         Titles and text come from JSONPlaceholder, a training API, so they are placeholder Latin.
         The scan type and the code follow from the record number.</p>
 
-    <p class="file-warning" id="file-warning" hidden>This page needs a local HTTP server. In this folder run
-        <code>python -m http.server 8080</code> and open <code>http://localhost:8080/api.html</code>.</p>
+    <p class="file-warning" id="file-warning" hidden>This page needs a local HTTP server. In the web_lab5 folder run
+        <code>npm run dev</code> and open <code>http://localhost:5173/api.html</code>.</p>
     <script>
         if (location.protocol === "file:") document.getElementById("file-warning").hidden = false;
     </script>

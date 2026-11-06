@@ -1,4 +1,6 @@
 // js/api-view.js: turns data into DOM nodes and switches the interface states.
+import { scanImage } from "@/js/images.js";
+import { MODALITIES } from "./storage.js";
 import { createButton, createEl } from "./utils.js";
 
 // One scan type per record, in the order of the lab 3 catalogue: records 1 to 8 get its codes
@@ -28,8 +30,8 @@ let focusBack = null;  // a control that lost the keyboard focus by being switch
 const createImage = (post) => {
   const { key } = scanTypeOf(post);
   const image = createEl("img", "card__image");
-  image.src = `img/${key}.webp`;
-  image.alt = window.App.storage.MODALITIES[key];
+  image.src = scanImage(key);
+  image.alt = MODALITIES[key];
   image.width = 640;
   image.height = 400;
   image.loading = "lazy";

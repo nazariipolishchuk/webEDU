@@ -5,15 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="Measurements and cross-origin checks of the DrAnnotation publications API.">
     <title>DrAnnotation — network checks</title>
-    <link rel="icon" href="img/logo.svg" type="image/svg+xml">
-    <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="css/api.css">
+    <link rel="icon" href="assets/img/logo.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="styles/style.css">
+    <link rel="stylesheet" href="styles/api.css">
     <script type="module" src="js/network.js"></script>
 </head>
 <body class="page">
 <header class="header">
     <a class="logo" href="index.html" aria-label="DrAnnotation home">
-        <img class="logo__mark" src="img/logo.svg" alt="" width="40" height="40">
+        <img class="logo__mark" src="assets/img/logo.svg" alt="" width="40" height="40">
         <span class="logo__name">Dr</span><span class="logo__word">Annotation</span>
     </a>
 
@@ -53,8 +53,8 @@
     <p class="content__lead">Run each check with the Network tab of the developer tools open.
         Every result below comes from real requests to JSONPlaceholder.</p>
 
-    <p class="file-warning" id="file-warning" hidden>This page needs a local HTTP server. In this folder run
-        <code>python -m http.server 8080</code> and open <code>http://localhost:8080/network.html</code>.</p>
+    <p class="file-warning" id="file-warning" hidden>This page needs a local HTTP server. In the web_lab5 folder run
+        <code>npm run dev</code> and open <code>http://localhost:5173/network.html</code>.</p>
     <script>
         if (location.protocol === "file:") document.getElementById("file-warning").hidden = false;
     </script>

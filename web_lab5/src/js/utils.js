@@ -1,5 +1,4 @@
-// js/utils.js: debounce and safe localStorage access from lab 3, the same code as module exports.
-// The classic scripts of lab 3 keep them private, so they stay untouched.
+// js/utils.js: debounce and safe localStorage access from lab 3, DOM helpers, the API address.
 
 // Runs fn only after the calls stop for delay ms
 export const debounce = (fn, delay) => {
