@@ -3,3 +3,9 @@
 *::after {
   box-sizing: border-box;
 }
+
+// iOS Safari enlarges the text in landscape: keep the sizes of the design.
+// Written without a prefix, Autoprefixer adds -webkit- and -moz-.
+html {
+  text-size-adjust: 100%;
+}
