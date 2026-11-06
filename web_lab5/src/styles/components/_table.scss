@@ -1,0 +1,25 @@
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--color-surface);
+  font-variant-numeric: tabular-nums;
+
+  &__caption {
+    padding-block: var(--gap-s);
+    color: var(--color-muted);
+    font-size: var(--fs-s);
+    text-align: left;
+  }
+
+  &__head,
+  &__cell {
+    padding: var(--gap-s) var(--gap);
+    border-bottom: var(--border) solid var(--color-line);
+    text-align: left;
+  }
+
+  &__head {
+    color: var(--color-heading);
+    font-size: var(--fs-s);
+  }
+}

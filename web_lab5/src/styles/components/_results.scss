@@ -1,0 +1,41 @@
+// Table of the measurements on network.html
+.table-wrap {
+  overflow-x: auto;
+}
+
+.results {
+  width: 100%;
+  margin-top: var(--gap-s);
+  border-collapse: collapse;
+  background: var(--color-surface);
+  font-variant-numeric: lining-nums tabular-nums;
+
+  &__caption {
+    padding-block: var(--gap-xs);
+    color: var(--color-muted);
+    font-size: var(--fs-s);
+    text-align: left;
+  }
+
+  &__head,
+  &__cell {
+    padding: var(--gap-xs) var(--gap-s);
+    border-bottom: var(--border) solid var(--color-line);
+    text-align: left;
+    vertical-align: top;
+  }
+
+  &__head {
+    color: var(--color-heading);
+    font-size: var(--fs-s);
+  }
+
+  &__head--number,
+  &__cell--number {
+    text-align: right;
+  }
+
+  &__total {
+    font-weight: 700;
+  }
+}

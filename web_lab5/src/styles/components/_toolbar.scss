@@ -1,0 +1,15 @@
+// Search, filters and sorting
+.toolbar {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, var(--field-min)), 1fr));
+  align-items: end;
+  gap: var(--gap-s) var(--gap);
+  margin-bottom: var(--gap-l);
+
+  &__actions {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--gap-s);
+  }
+}

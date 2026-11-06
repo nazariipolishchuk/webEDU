@@ -1,0 +1,27 @@
+.stat {
+  display: flex;
+  flex-direction: column;
+  padding: var(--gap) var(--gap) var(--gap-l);
+  border-top: var(--bar) solid var(--color-red);
+  background: var(--color-surface);
+
+  &__value {
+    color: var(--color-heading);
+    font-family: var(--font-head);
+    font-size: var(--fs-stat);
+    font-weight: 700;
+    line-height: var(--line-height-head);
+    font-variant-numeric: lining-nums tabular-nums;
+    overflow-wrap: anywhere;
+  }
+
+  &__label {
+    margin-top: var(--gap-xs);
+    font-weight: 700;
+  }
+
+  &__note {
+    color: var(--color-muted);
+    font-size: var(--fs-s);
+  }
+}

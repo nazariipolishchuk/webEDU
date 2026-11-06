@@ -1,0 +1,32 @@
+@use "../abstracts" as a;
+
+.footer {
+  grid-area: footer;
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-xs);
+  padding: var(--gap-l) var(--page-inline);
+  background: var(--color-masthead);
+  color: var(--color-masthead-ink);
+  font-size: var(--fs-s);
+
+  @include a.respond-from(a.$bp-tablet) {
+    flex-direction: row;
+    justify-content: space-between;
+    gap: var(--gap);
+  }
+
+  &__text {
+    margin: 0;
+  }
+
+  &__link {
+    margin-right: var(--gap-s);
+    color: var(--color-masthead-ink);
+    font-weight: 700;
+
+    &:focus-visible {
+      @include a.focus-ring;
+    }
+  }
+}

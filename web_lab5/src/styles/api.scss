@@ -1,0 +1,24 @@
+// api.scss: the second stylesheet of api.html and network.html, loaded after main.scss.
+// Colours, spacing and fonts are the custom properties that main.scss defines.
+@use "base/hidden";
+@use "components/file-warning";
+@use "components/catalog-remote";
+@use "components/state";
+@use "components/card-remote";
+@use "components/more";
+@use "components/publication";
+@use "components/box";
+@use "components/curator";
+@use "components/comment";
+@use "components/toolbar-remote";
+@use "components/check";
+@use "components/results";
+@use "components/log";
+
+// Sizes used only on these two pages
+:root {
+  --trace-width: 15rem;
+  --dialog-width: 56rem;
+  --dim: 0.55;
+  --sweep: 1.6s;
+}

@@ -1,0 +1,8 @@
+// Shown when a page is opened from file://, where modules do not load
+.file-warning {
+  max-width: var(--measure);
+  margin: 0 0 var(--gap-l);
+  padding: var(--gap-s) var(--gap);
+  border-left: var(--rule) solid var(--color-danger);
+  background: var(--color-surface);
+}

@@ -1,0 +1,41 @@
+@use "../abstracts" as a;
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-xs);
+  min-width: 0;
+
+  &__label {
+    color: var(--color-heading);
+    font-size: var(--fs-s);
+    font-weight: 700;
+  }
+
+  &__control {
+    width: 100%;
+    padding: var(--gap-xs) var(--gap-s);
+    border: var(--border) solid var(--color-field-line);
+    border-radius: var(--radius-s);
+    background: var(--color-field);
+    color: var(--color-ink);
+    font: inherit;
+
+    &[aria-invalid="true"] {
+      border-color: var(--color-danger);
+      box-shadow: inset var(--bar) 0 0 var(--color-danger);
+    }
+
+    &:focus-visible {
+      @include a.focus-ring;
+    }
+  }
+
+  &__error {
+    min-height: 1.25rem;
+    margin: 0;
+    color: var(--color-danger);
+    font-size: var(--fs-xs);
+    font-weight: 600;
+  }
+}
