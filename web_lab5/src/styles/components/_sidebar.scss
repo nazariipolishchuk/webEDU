@@ -1,0 +1,15 @@
+@use "../abstracts" as a;
+
+// Sidebar: the doctor and dashboard sections
+.sidebar {
+  grid-area: aside;
+  padding: var(--gap);
+  background: var(--color-surface);
+  border-bottom: var(--border) solid var(--color-line);
+
+  @include a.respond-from(a.$bp-tablet) {
+    padding: var(--gap-l) var(--gap);
+    border-bottom: 0;
+    border-right: var(--border) solid var(--color-line);
+  }
+}

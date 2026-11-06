@@ -1,0 +1,30 @@
+@use "../abstracts" as a;
+
+// Buttons on a light surface. The masthead keeps its own .button
+.action {
+  padding: var(--gap-xs) var(--gap-s);
+  border: var(--border) solid var(--color-field-line);
+  border-radius: var(--radius-s);
+  background: transparent;
+  color: var(--color-ink);
+  font: inherit;
+  font-size: var(--fs-s);
+  font-weight: 600;
+  cursor: pointer;
+
+  &:focus-visible {
+    @include a.focus-ring;
+  }
+
+  &--primary {
+    padding-inline: var(--gap);
+    border-color: var(--color-red-strong);
+    background: var(--color-red-strong);
+    color: var(--color-on-red);
+  }
+
+  &--danger {
+    border-color: var(--color-danger);
+    color: var(--color-danger);
+  }
+}

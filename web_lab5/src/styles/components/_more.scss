@@ -1,0 +1,10 @@
+.more {
+  margin-top: var(--gap-l);
+  text-align: center;
+
+  &__end {
+    margin: 0;
+    color: var(--color-muted);
+    font-size: var(--fs-s);
+  }
+}

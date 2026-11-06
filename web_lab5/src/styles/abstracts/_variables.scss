@@ -1,0 +1,75 @@
+// Design tokens. Colours stay CSS custom properties (base/_root.scss): the dark theme swaps them
+// at run time, which Sass cannot do. Everything that never changes in the browser is a Sass variable.
+// Map keys are quoted: an unquoted red would be the colour red, not a name.
+// Palettes (coolors.co, popular):
+// medical    E63946 F1FAEE A8DADC 457B9D 1D3557
+// scientific 001219 005F73 0A9396 94D2BD E9D8A6 EE9B00 CA6702 BB3E03 AE2012 9B2226
+
+$palette-light: (
+  "bg": #f1faee,
+  "surface": #ffffff,
+  "ink": #001219,
+  "heading": #1d3557,
+  "muted": #3f5568,
+  "line": #d4e4e6,
+  "rule": #1d3557,
+  "link": #005f73,
+  "masthead": #1d3557,
+  "masthead-ink": #f1faee,
+  "masthead-line": #457b9d,
+  "red": #e63946,
+  "red-strong": #ae2012,
+  "on-red": #ffffff,
+  "ready": #0a9396,
+  "collecting": #ee9b00,
+  "review": #457b9d,
+  "focus": #ee9b00,
+  "danger": #ae2012,
+  "field": #ffffff,
+  "field-line": #5c7385,
+);
+
+// Only the colours that differ in the dark theme
+$palette-dark: (
+  "bg": #001219,
+  "surface": #0a2230,
+  "ink": #f1faee,
+  "heading": #f1faee,
+  "muted": #a8dadc,
+  "line": #18394a,
+  "rule": #94d2bd,
+  "link": #94d2bd,
+  "ready": #94d2bd,
+  "collecting": #e9d8a6,
+  "review": #a8dadc,
+  "focus": #e9d8a6,
+  "danger": #ffb4ab,
+  "field": #001219,
+  "field-line": #7f9bac,
+);
+
+$shadow-light: 0 1rem 2rem rgba(29, 53, 87, 0.18);
+$shadow-dark: 0 1rem 2rem rgba(0, 0, 0, 0.55);
+
+// Spacing: one step, the rest are its multiples
+$gap: 1rem;
+
+// Typography, sizes in px of the design, turned into rem by rem()
+$font-body: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+$font-head: Georgia, "Times New Roman", serif;
+$font-sizes: (
+  "xs": 13,
+  "s": 15,
+  "base": 16,
+  "m": 20,
+  "l": 26,
+  "stat": 26,
+);
+
+// Breakpoints: the sidebar appears at 768px, the content width is capped at 1200px
+$bp-tablet: 48em;
+$bp-desktop: 75em;
+
+// Motion
+$duration: 0.25s;
+$easing: cubic-bezier(0.2, 0.7, 0.2, 1);

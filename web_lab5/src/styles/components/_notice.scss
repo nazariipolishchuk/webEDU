@@ -1,0 +1,44 @@
+@use "../abstracts" as a;
+
+// Message after an action
+.notice {
+  position: fixed;
+  left: 50%;
+  bottom: var(--gap);
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--gap);
+  width: min(calc(100% - var(--gap-l)), var(--notice-width));
+  padding: var(--gap-s) var(--gap);
+  background: var(--color-masthead);
+  color: var(--color-masthead-ink);
+  border-left: var(--rule) solid var(--color-red);
+  box-shadow: var(--shadow);
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-50%, var(--gap));
+  transition: a.motion(opacity, transform);
+
+  &--visible {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translate(-50%, 0);
+  }
+
+  &__text {
+    margin: 0;
+    font-size: var(--fs-s);
+  }
+
+  &__undo {
+    flex: none;
+    border-color: var(--color-masthead-ink);
+    color: var(--color-masthead-ink);
+  }
+
+  @include a.reduced-motion {
+    transition: none;
+  }
+}

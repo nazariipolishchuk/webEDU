@@ -1,0 +1,32 @@
+.curator__name {
+  margin: 0 0 var(--gap-s);
+  color: var(--color-heading);
+  font-family: var(--font-head);
+  font-size: var(--fs-m);
+}
+
+// Name and value pairs of the curator card
+.facts {
+  margin: 0 0 var(--gap);
+
+  &__row {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 0 var(--gap);
+    padding-block: var(--gap-xs);
+    border-bottom: var(--border) solid var(--color-line);
+  }
+
+  &__name {
+    color: var(--color-muted);
+    font-size: var(--fs-s);
+  }
+
+  &__value {
+    margin: 0;
+    font-size: var(--fs-s);
+    font-weight: 600;
+    overflow-wrap: anywhere;
+  }
+}

@@ -1,0 +1,277 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta
+            name="description"
+            content="DrAnnotation is a charity platform where doctors donate de-identified scans and label them, building open datasets for models that detect disease."
+        />
+        <title>DrAnnotation — dataset catalogue</title>
+        <link rel="icon" href="assets/img/logo.svg" type="image/svg+xml" />
+        <link rel="stylesheet" href="styles/main.scss" />
+        <script type="module" src="js/main.js"></script>
+    </head>
+    <body class="page">
+        <header class="header">
+            <a class="logo" href="#overview" aria-label="DrAnnotation home">
+                <img class="logo__mark" src="assets/img/logo.svg" alt="" width="40" height="40" />
+                <span class="logo__name">Dr</span><span class="logo__word">Annotation</span>
+            </a>
+
+            <nav class="nav" aria-label="Main">
+                <ul class="nav__list">
+                    <li class="nav__item"><a class="nav__link" href="#overview">Overview</a></li>
+                    <li class="nav__item">
+                        <a class="nav__link nav__link--active" href="#datasets" aria-current="page">Datasets</a>
+                    </li>
+                    <li class="nav__item"><a class="nav__link" href="api.html">Publications</a></li>
+                    <li class="nav__item"><a class="nav__link" href="#labelling">Labelling</a></li>
+                </ul>
+            </nav>
+
+            <div class="header__actions">
+                <a class="button button--primary" href="#add-dataset">Add a dataset</a>
+                <a class="button" href="#profile">My profile</a>
+            </div>
+        </header>
+
+        <aside class="sidebar">
+            <div class="doctor">
+                <p class="doctor__name">Dr Olena Koval</p>
+                <p class="doctor__role">Consultant radiologist, Cherkasy</p>
+            </div>
+
+            <nav class="menu" aria-label="Dashboard sections">
+                <ul class="menu__list">
+                    <li class="menu__item"><a class="menu__link menu__link--active" href="#overview">Overview</a></li>
+                    <li class="menu__item">
+                        <a class="menu__link" href="#uploads">My uploads <span class="menu__count">312</span></a>
+                    </li>
+                    <li class="menu__item">
+                        <a class="menu__link" href="#labelling">Labelling queue <span class="menu__count">18</span></a>
+                    </li>
+                    <li class="menu__item">
+                        <a class="menu__link" href="#de-identification"
+                            >De-identification checks <span class="menu__count">4</span></a
+                        >
+                    </li>
+                    <li class="menu__item"><a class="menu__link" href="#datasets">Datasets</a></li>
+                    <li class="menu__item"><a class="menu__link" href="#contributors">Contributors</a></li>
+                    <li class="menu__item"><a class="menu__link" href="#settings">Settings</a></li>
+                </ul>
+            </nav>
+        </aside>
+
+        <main class="content" id="overview">
+            <h1 class="content__title">Dataset catalogue</h1>
+            <p class="content__lead">
+                Datasets that doctors have donated to train models that spot disease early. The price is what labelling
+                one scan costs the project, so scans × price gives the value of a dataset.
+            </p>
+
+            <section class="summary" aria-labelledby="summary-title">
+                <h2 class="section-title" id="summary-title">Summary</h2>
+                <ul class="summary__list">
+                    <li class="stat">
+                        <span class="stat__value" id="stat-total"></span>
+                        <span class="stat__label">datasets in the catalogue</span>
+                        <span class="stat__note" id="stat-total-note"></span>
+                    </li>
+                    <li class="stat">
+                        <span class="stat__value" id="stat-selected"></span>
+                        <span class="stat__label">selected for training</span>
+                        <span class="stat__note" id="stat-selected-note"></span>
+                    </li>
+                    <li class="stat">
+                        <span class="stat__value" id="stat-shown"></span>
+                        <span class="stat__label">shown by the filters</span>
+                        <span class="stat__note" id="stat-shown-note"></span>
+                    </li>
+                    <li class="stat">
+                        <span class="stat__value" id="stat-value"></span>
+                        <span class="stat__label">total value</span>
+                        <span class="stat__note" id="stat-value-note"></span>
+                    </li>
+                </ul>
+            </section>
+
+            <section class="editor" id="add-dataset" aria-labelledby="add-title">
+                <h2 class="section-title" id="add-title">Add a dataset</h2>
+                <form class="form" name="dataset" novalidate>
+                    <div class="field">
+                        <label class="field__label" for="dataset-title">Name</label>
+                        <input
+                            class="field__control"
+                            id="dataset-title"
+                            name="title"
+                            type="text"
+                            required
+                            minlength="3"
+                            maxlength="60"
+                            autocomplete="off"
+                            aria-describedby="dataset-title-error"
+                        />
+                        <p class="field__error" id="dataset-title-error"></p>
+                    </div>
+                    <div class="field">
+                        <label class="field__label" for="dataset-code">Code</label>
+                        <input
+                            class="field__control"
+                            id="dataset-code"
+                            name="code"
+                            type="text"
+                            required
+                            pattern="[A-Z]{2,4}-[0-9]{3,5}"
+                            maxlength="10"
+                            placeholder="CXR-1001"
+                            autocomplete="off"
+                            aria-describedby="dataset-code-error"
+                        />
+                        <p class="field__error" id="dataset-code-error"></p>
+                    </div>
+                    <div class="field">
+                        <label class="field__label" for="dataset-modality">Scan type</label>
+                        <select
+                            class="field__control"
+                            id="dataset-modality"
+                            name="modality"
+                            required
+                            aria-describedby="dataset-modality-error"
+                        >
+                            <option value="">Choose…</option>
+                            <option value="chest-xray">Chest X-ray</option>
+                            <option value="brain-mri">Brain MRI</option>
+                            <option value="ecg">ECG</option>
+                            <option value="dermatoscopy">Dermatoscopy</option>
+                            <option value="histology">Histology</option>
+                            <option value="fundus">Retina</option>
+                            <option value="lung-ct">Lung CT</option>
+                            <option value="bone-xray">Bone X-ray</option>
+                        </select>
+                        <p class="field__error" id="dataset-modality-error"></p>
+                    </div>
+                    <div class="field">
+                        <label class="field__label" for="dataset-status">Status</label>
+                        <select class="field__control" id="dataset-status" name="status">
+                            <option value="ready">Ready for training</option>
+                            <option value="collecting">Collecting</option>
+                            <option value="review">In review</option>
+                        </select>
+                        <p class="field__error"></p>
+                    </div>
+                    <div class="field">
+                        <label class="field__label" for="dataset-quantity">Scans</label>
+                        <input
+                            class="field__control"
+                            id="dataset-quantity"
+                            name="quantity"
+                            type="number"
+                            required
+                            min="1"
+                            max="10000000"
+                            step="1"
+                            inputmode="numeric"
+                            aria-describedby="dataset-quantity-error"
+                        />
+                        <p class="field__error" id="dataset-quantity-error"></p>
+                    </div>
+                    <div class="field">
+                        <label class="field__label" for="dataset-price">Price per scan, ₴</label>
+                        <input
+                            class="field__control"
+                            id="dataset-price"
+                            name="price"
+                            type="number"
+                            required
+                            min="0"
+                            max="100000"
+                            step="0.01"
+                            inputmode="decimal"
+                            aria-describedby="dataset-price-error"
+                        />
+                        <p class="field__error" id="dataset-price-error"></p>
+                    </div>
+                    <div class="field form__wide">
+                        <label class="field__label" for="dataset-text">Description (optional)</label>
+                        <input
+                            class="field__control"
+                            id="dataset-text"
+                            name="text"
+                            type="text"
+                            maxlength="160"
+                            autocomplete="off"
+                        />
+                        <p class="field__error"></p>
+                    </div>
+                    <div class="form__actions">
+                        <button class="action action--primary" type="submit">Add dataset</button>
+                        <button class="action" type="reset">Clear form</button>
+                    </div>
+                </form>
+            </section>
+
+            <section class="catalog" id="datasets" aria-labelledby="datasets-title">
+                <h2 class="section-title" id="datasets-title">Datasets</h2>
+                <div class="toolbar">
+                    <div class="field toolbar__search">
+                        <label class="field__label" for="search">Search by name</label>
+                        <input class="field__control" id="search" type="search" autocomplete="off" />
+                    </div>
+                    <div class="field">
+                        <label class="field__label" for="filter-status">Status</label>
+                        <select class="field__control" id="filter-status">
+                            <option value="all">All statuses</option>
+                            <option value="ready">Ready for training</option>
+                            <option value="collecting">Collecting</option>
+                            <option value="review">In review</option>
+                        </select>
+                    </div>
+                    <div class="field">
+                        <label class="field__label" for="filter-selection">Selection</label>
+                        <select class="field__control" id="filter-selection">
+                            <option value="all">All datasets</option>
+                            <option value="selected">Selected for training</option>
+                            <option value="not-selected">Not selected</option>
+                        </select>
+                    </div>
+                    <div class="field">
+                        <label class="field__label" for="sort">Sort by</label>
+                        <select class="field__control" id="sort">
+                            <option value="title-asc">Name, A to Z</option>
+                            <option value="title-desc">Name, Z to A</option>
+                            <option value="price-asc">Price, low to high</option>
+                            <option value="price-desc">Price, high to low</option>
+                            <option value="quantity-desc">Most scans</option>
+                            <option value="value-desc">Highest value</option>
+                        </select>
+                    </div>
+                    <div class="toolbar__actions">
+                        <button class="action" id="export-selected" type="button">Export selected as JSON</button>
+                        <button class="action action--danger" id="clear-storage" type="button">Clear saved data</button>
+                    </div>
+                </div>
+                <ul class="catalog__list" id="dataset-list"></ul>
+            </section>
+
+            <div class="notice" id="notice" role="status">
+                <p class="notice__text" id="notice-text"></p>
+                <button class="action notice__undo" id="notice-undo" type="button" hidden>Undo</button>
+            </div>
+        </main>
+
+        <footer class="footer">
+            <p class="footer__text">
+                DrAnnotation is a charity project. We accept de-identified data only, and the datasets belong to the
+                community.
+            </p>
+            <p class="footer__text">
+                <a class="footer__link" href="api.html">Publications</a>
+                <a class="footer__link" href="network.html">Network checks</a>
+                <a class="footer__link" href="tasks.html">Language tasks</a>
+                <a class="footer__link" href="strict.html">Strict mode</a>
+                Lab work 4, Polishchuk N., group PZ-2404
+            </p>
+        </footer>
+    </body>
+</html>
