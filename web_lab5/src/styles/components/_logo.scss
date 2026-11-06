@@ -1,0 +1,37 @@
+@use "../abstracts" as a;
+
+.logo {
+  display: inline-flex;
+  align-items: center;
+  color: var(--color-masthead-ink);
+  font-size: var(--fs-l);
+  line-height: 1;
+  letter-spacing: var(--tracking-tight);
+  text-decoration: none;
+
+  &:focus-visible {
+    @include a.focus-ring;
+  }
+
+  @include a.respond-from(a.$bp-tablet) {
+    padding-block: var(--gap);
+    font-size: var(--fs-m);
+  }
+
+  @include a.respond-from(a.$bp-desktop) {
+    font-size: var(--fs-l);
+  }
+
+  &__mark {
+    display: block;
+    margin-right: var(--gap-s);
+  }
+
+  &__name {
+    font-weight: 800;
+  }
+
+  &__word {
+    font-weight: 300;
+  }
+}

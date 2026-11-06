@@ -1,0 +1,58 @@
+// The publication dialog
+.publication {
+  width: min(calc(100% - var(--gap-l)), var(--dialog-width));
+  max-height: calc(100dvh - var(--gap-l));
+  padding: 0;
+  border: 0;
+  border-top: var(--rule) solid var(--color-red);
+  background: var(--color-bg);
+  color: var(--color-ink);
+  box-shadow: var(--shadow);
+  overflow-y: auto;
+
+  &::backdrop {
+    background: rgba(0, 18, 25, 0.6);
+  }
+
+  &__head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--gap);
+    padding: var(--gap-l) var(--gap) var(--gap-s);
+  }
+
+  &__heading {
+    min-width: 0;
+  }
+
+  &__type,
+  &__code {
+    margin: 0;
+    color: var(--color-muted);
+    font-size: var(--fs-xs);
+    font-weight: 700;
+  }
+
+  &__title {
+    margin: var(--gap-xs) 0;
+    color: var(--color-heading);
+    font-family: var(--font-head);
+    font-size: var(--fs-l);
+    line-height: var(--line-height-head);
+  }
+
+  &__body {
+    max-width: var(--measure);
+    margin: 0;
+    padding: 0 var(--gap) var(--gap-l);
+    white-space: pre-line;
+  }
+
+  &__parts {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
+    gap: var(--gap-l);
+    padding: 0 var(--gap) var(--gap-l);
+  }
+}

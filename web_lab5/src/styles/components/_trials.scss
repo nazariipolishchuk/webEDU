@@ -1,0 +1,18 @@
+// Strict mode page: two result columns
+.trials {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 24rem), 1fr));
+  gap: var(--gap-l);
+
+  &__list {
+    margin: 0;
+    padding-left: var(--gap-l);
+    font-size: var(--fs-s);
+  }
+
+  &__row {
+    padding-block: var(--gap-xs);
+    border-bottom: var(--border) solid var(--color-line);
+    overflow-wrap: anywhere;
+  }
+}

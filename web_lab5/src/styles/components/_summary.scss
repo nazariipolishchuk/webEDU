@@ -1,0 +1,13 @@
+@use "../abstracts" as a;
+
+// Summary figures
+.summary {
+  margin-bottom: var(--gap-xl);
+
+  &__list {
+    @include a.list-reset;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, var(--stat-min)), 1fr));
+    gap: var(--gap);
+  }
+}

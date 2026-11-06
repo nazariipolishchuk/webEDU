@@ -1,0 +1,18 @@
+// The catalogue filled from the API
+.catalog {
+  // The cards arrive later, so their place is kept and the footer does not jump
+  &--remote {
+    min-height: 120vh;
+  }
+
+  &__list[aria-busy="true"] {
+    opacity: var(--dim);
+  }
+}
+
+.source {
+  min-height: 1.5em;
+  margin: 0 0 var(--gap);
+  color: var(--color-muted);
+  font-size: var(--fs-s);
+}

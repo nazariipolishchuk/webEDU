@@ -1,0 +1,10 @@
+// Section heading under a heavy rule, newsroom style
+.section-title {
+  margin: 0 0 var(--gap);
+  padding-top: var(--gap-s);
+  border-top: var(--rule) solid var(--color-rule);
+  color: var(--color-heading);
+  font-family: var(--font-head);
+  font-size: var(--fs-l);
+  line-height: var(--line-height-head);
+}
