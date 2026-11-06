@@ -54,7 +54,7 @@ $("#measure").addEventListener("click", async (event) => {
   $("#measure-table").hidden = false;
 
   try {
-    await fetchResource(PATHS[0]);  // opens the connection, so the first run pays no extra for it
+    await fetchResource(PATHS[0]); // opens the connection, so the first run pays no extra for it
     const times = { one: [], all: [] };
     for (let run = 1; run <= RUNS; run++) {
       status.textContent = `Run ${run} of ${RUNS}…`;
@@ -62,10 +62,20 @@ $("#measure").addEventListener("click", async (event) => {
       const all = await timed(parallel);
       times.one.push(one);
       times.all.push(all);
-      rows.append(createRow([{ text: String(run) }, { text: String(one), number: true }, { text: String(all), number: true }]));
+      rows.append(
+        createRow([
+          { text: String(run) },
+          { text: String(one), number: true },
+          { text: String(all), number: true },
+        ]),
+      );
     }
     const medians = [median(times.one), median(times.all)];
-    const total = createRow([{ text: "Median" }, { text: String(medians[0]), number: true }, { text: String(medians[1]), number: true }]);
+    const total = createRow([
+      { text: "Median" },
+      { text: String(medians[0]), number: true },
+      { text: String(medians[1]), number: true },
+    ]);
     total.className = "results__total";
     rows.append(total);
     status.textContent = `Promise.all took ${(medians[0] / medians[1]).toFixed(1)} times less time.`;
@@ -92,16 +102,30 @@ $("#compare").addEventListener("click", async (event) => {
     await Promise.all(PATHS_WITH_FAILURE.map(fetchResource));
   } catch (error) {
     const ms = Math.round(performance.now() - start);
-    rows.append(createRow([{ text: "Promise.all" }, { text: `Rejected after ${ms} ms with “${error.message}”. The results of the other two are lost.` }]));
+    rows.append(
+      createRow([
+        { text: "Promise.all" },
+        {
+          text: `Rejected after ${ms} ms with “${error.message}”. The results of the other two are lost.`,
+        },
+      ]),
+    );
   }
 
   start = performance.now();
   const results = await Promise.allSettled(PATHS_WITH_FAILURE.map(fetchResource));
   const ms = Math.round(performance.now() - start);
-  const parts = results.map((result, index) => (result.status === "fulfilled"
-    ? `${PATHS_WITH_FAILURE[index]}: fulfilled, ${summarise(result.value)}`
-    : `${PATHS_WITH_FAILURE[index]}: rejected, ${result.reason.message}`));
-  rows.append(createRow([{ text: "Promise.allSettled" }, { text: `Settled after ${ms} ms. ${parts.join("; ")}.` }]));
+  const parts = results.map((result, index) =>
+    result.status === "fulfilled"
+      ? `${PATHS_WITH_FAILURE[index]}: fulfilled, ${summarise(result.value)}`
+      : `${PATHS_WITH_FAILURE[index]}: rejected, ${result.reason.message}`,
+  );
+  rows.append(
+    createRow([
+      { text: "Promise.allSettled" },
+      { text: `Settled after ${ms} ms. ${parts.join("; ")}.` },
+    ]),
+  );
   button.disabled = false;
 });
 
@@ -115,7 +139,8 @@ const ERROR_CHECKS = {
     controller.abort();
     return answer;
   },
-  timeout: () => request(`${BASE_URL}/posts/1`, { cache: "no-store", signal: AbortSignal.timeout(1) }),
+  timeout: () =>
+    request(`${BASE_URL}/posts/1`, { cache: "no-store", signal: AbortSignal.timeout(1) }),
 };
 
 $("#errors").addEventListener("click", async (event) => {
@@ -126,7 +151,12 @@ $("#errors").addEventListener("click", async (event) => {
     addLog($("#errors-log"), event.target.textContent, "The request succeeded.");
   } catch (error) {
     const status = error.status ? `, status ${error.status}` : "";
-    addLog($("#errors-log"), event.target.textContent, `${error.name}: ${error.message}${status}`, true);
+    addLog(
+      $("#errors-log"),
+      event.target.textContent,
+      `${error.name}: ${error.message}${status}`,
+      true,
+    );
   }
 });
 
@@ -140,15 +170,17 @@ const CORS_CHECKS = {
   },
   post: {
     label: "POST /posts, Content-Type: application/json",
-    send: () => fetch(`${REMOTE_URL}/posts`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ title: "New publication", body: "Text", userId: 1 }),
-    }),
+    send: () =>
+      fetch(`${REMOTE_URL}/posts`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ title: "New publication", body: "Text", userId: 1 }),
+      }),
   },
   header: {
     label: "GET /posts/1, X-Request-Id: lab-04",
-    send: () => fetch(`${REMOTE_URL}/posts/1`, { cache: "no-store", headers: { "X-Request-Id": "lab-04" } }),
+    send: () =>
+      fetch(`${REMOTE_URL}/posts/1`, { cache: "no-store", headers: { "X-Request-Id": "lab-04" } }),
   },
   blocked: {
     label: "GET https://example.com/",
@@ -163,8 +195,17 @@ $("#cors").addEventListener("click", async (event) => {
   try {
     const response = await send();
     const readable = [...response.headers.keys()].join(", ");
-    addLog($("#cors-log"), label, `Status ${response.status}. Headers the script may read: ${readable}.`);
+    addLog(
+      $("#cors-log"),
+      label,
+      `Status ${response.status}. Headers the script may read: ${readable}.`,
+    );
   } catch (error) {
-    addLog($("#cors-log"), label, `${error.name}: ${error.message}. The console has the reason, the script does not.`, true);
+    addLog(
+      $("#cors-log"),
+      label,
+      `${error.name}: ${error.message}. The console has the reason, the script does not.`,
+      true,
+    );
   }
 });

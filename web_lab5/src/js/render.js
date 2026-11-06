@@ -46,14 +46,20 @@ const createStatus = ({ status }) =>
 const createLedger = (item) => {
   const ledger = createEl("p", "card__ledger");
   const sum = `${number(item.quantity)} scans × ${money(item.price)}`;
-  ledger.append(createEl("span", "card__sum", sum), createEl("strong", "card__value", money(valueOf(item))));
+  ledger.append(
+    createEl("span", "card__sum", sum),
+    createEl("strong", "card__value", money(valueOf(item))),
+  );
   return ledger;
 };
 
 const createActions = (item) => {
   const actions = createEl("div", "card__actions");
 
-  const toggle = createButton(`action card__toggle${item.selected ? " card__toggle--on" : ""}`, "Selected for training");
+  const toggle = createButton(
+    `action card__toggle${item.selected ? " card__toggle--on" : ""}`,
+    "Selected for training",
+  );
   toggle.setAttribute("aria-pressed", String(item.selected));
   toggle.setAttribute("aria-label", `Selected for training: ${item.title}`);
 
@@ -83,7 +89,8 @@ const createField = (item, name, labelText, control) => {
   return field;
 };
 
-const createInput = (properties) => Object.assign(document.createElement("input"), { required: true }, properties);
+const createInput = (properties) =>
+  Object.assign(document.createElement("input"), { required: true }, properties);
 
 const createStatusSelect = (item) => {
   const select = document.createElement("select");
@@ -99,9 +106,36 @@ const createEditCard = (item) => {
 
   const fields = createEl("div", "card__fields");
   fields.append(
-    createField(item, "title", "Name", createInput({ type: "text", value: item.title, minLength: 3, maxLength: 60 })),
-    createField(item, "quantity", "Scans", createInput({ type: "number", value: String(item.quantity), min: "1", max: "10000000", step: "1" })),
-    createField(item, "price", "Price per scan, ₴", createInput({ type: "number", value: (item.price / 100).toFixed(2), min: "0", max: "100000", step: "0.01" })),
+    createField(
+      item,
+      "title",
+      "Name",
+      createInput({ type: "text", value: item.title, minLength: 3, maxLength: 60 }),
+    ),
+    createField(
+      item,
+      "quantity",
+      "Scans",
+      createInput({
+        type: "number",
+        value: String(item.quantity),
+        min: "1",
+        max: "10000000",
+        step: "1",
+      }),
+    ),
+    createField(
+      item,
+      "price",
+      "Price per scan, ₴",
+      createInput({
+        type: "number",
+        value: (item.price / 100).toFixed(2),
+        min: "0",
+        max: "100000",
+        step: "0.01",
+      }),
+    ),
     createField(item, "status", "Status", createStatusSelect(item)),
   );
 
@@ -147,10 +181,12 @@ const SELECTION = {
 
 const visibleItems = ({ items, view }) => {
   const query = view.query.trim().toLowerCase();
-  const filtered = items.filter((item) =>
-    item.title.toLowerCase().includes(query)
-    && (view.status === "all" || item.status === view.status)
-    && SELECTION[view.selection](item));
+  const filtered = items.filter(
+    (item) =>
+      item.title.toLowerCase().includes(query) &&
+      (view.status === "all" || item.status === view.status) &&
+      SELECTION[view.selection](item),
+  );
   return [...filtered].sort(COMPARE[view.sort]); // a copy: state.items keeps its order
 };
 
@@ -158,7 +194,11 @@ const createEmpty = (state) => {
   const empty = createEl("li", "catalog__empty");
   if (state.items.length === 0) {
     empty.append(
-      createEl("p", "catalog__message", "The catalogue is empty. Add a dataset with the form above, or load the samples."),
+      createEl(
+        "p",
+        "catalog__message",
+        "The catalogue is empty. Add a dataset with the form above, or load the samples.",
+      ),
       createButton("action catalog__sample", "Load sample datasets"),
     );
     return empty;

@@ -19,23 +19,53 @@
   };
 
   // Runtime differences
-  check("assign to an undeclared variable", () => { undeclared = 1; return undeclared; });
-  check("this in a plain function call", function () { return String(this); });
+  // The check is what assigning an undeclared variable does
+  /* eslint-disable no-undef */
+  check("assign to an undeclared variable", () => {
+    undeclared = 1;
+    return undeclared;
+  });
+  /* eslint-enable no-undef */
+  check("this in a plain function call", function () {
+    return String(this);
+  });
 
   const frozen = Object.freeze({ a: 1 });
-  check("write to a frozen object", () => { frozen.a = 2; return frozen.a; });
+  check("write to a frozen object", () => {
+    frozen.a = 2;
+    return frozen.a;
+  });
 
   const closed = Object.preventExtensions({});
-  check("add a property to a non-extensible object", () => { closed.a = 1; return closed.a; });
+  check("add a property to a non-extensible object", () => {
+    closed.a = 1;
+    return closed.a;
+  });
 
-  const getterOnly = { get a() { return 1; } };
-  check("write to a getter-only property", () => { getterOnly.a = 2; return getterOnly.a; });
+  const getterOnly = {
+    get a() {
+      return 1;
+    },
+  };
+  check("write to a getter-only property", () => {
+    getterOnly.a = 2;
+    return getterOnly.a;
+  });
 
   check("delete a non-configurable property", () => delete Object.prototype);
 
-  check("change a parameter, read arguments", () => (function (a) { a = 2; return arguments[0]; })(1));
+  check("change a parameter, read arguments", () =>
+    (function (a) {
+      // eslint-disable-next-line no-unused-vars -- the check is whether arguments follows the parameter
+      a = 2;
+      return arguments[0];
+    })(1),
+  );
 
-  check("declare a variable inside eval", () => { eval("var leaked = 1"); return typeof leaked; });
+  check("declare a variable inside eval", () => {
+    eval("var leaked = 1");
+    return typeof leaked;
+  });
 
   // Parse errors do not happen here: the same strings are valid in sloppy mode
   check("with statement", () => new Function("with (Math) return PI;")());

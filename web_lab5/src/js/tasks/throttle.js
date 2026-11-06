@@ -4,10 +4,10 @@ import { counter } from "./assert-counter.js";
 const assert = counter("throttle");
 
 const throttle = (fn, interval) => {
-  let last = -Infinity;                     // time of the last run, ms
+  let last = -Infinity; // time of the last run, ms
   return (...args) => {
     const now = performance.now();
-    if (now - last < interval) return;      // the interval has not passed: skip
+    if (now - last < interval) return; // the interval has not passed: skip
     last = now;
     fn(...args);
   };

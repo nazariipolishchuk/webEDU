@@ -21,7 +21,9 @@ const RETRY_DELAY = 500;
 const IDEMPOTENT = new Set(["GET", "HEAD", "OPTIONS", "PUT", "DELETE"]);
 
 let server = SERVERS.working;
-export const useServer = (name) => { server = SERVERS[name]; };
+export const useServer = (name) => {
+  server = SERVERS[name];
+};
 
 // HTTP/2 responses carry no reason phrase, so response.statusText is empty there
 const STATUS_TEXT = {
@@ -71,7 +73,11 @@ export async function request(url, { method = "GET", body, signal, headers = {},
     return await response.json();
   } catch (error) {
     if (!(error instanceof SyntaxError)) throw error; // AbortError and network errors go on as they are
-    throw new ApiError(`HTTP ${status}: the answer is not valid JSON`, { status, url, cause: error });
+    throw new ApiError(`HTTP ${status}: the answer is not valid JSON`, {
+      status,
+      url,
+      cause: error,
+    });
   }
 }
 
@@ -85,19 +91,25 @@ const limited = (signal) => {
 // A network failure, an overloaded server or a rate limit can pass, 404 will not.
 // A timeout is not repeated either: it goes straight to the error state with its Retry button.
 const isTemporary = (error) =>
-  error instanceof TypeError || (error instanceof ApiError && (error.status === 429 || error.status >= 500));
+  error instanceof TypeError ||
+  (error instanceof ApiError && (error.status === 429 || error.status >= 500));
 
-const pause = (ms, signal) => new Promise((resolve, reject) => {
-  if (signal?.aborted) {
-    reject(signal.reason);
-    return;
-  }
-  const timerId = setTimeout(resolve, ms);
-  signal?.addEventListener("abort", () => {
-    clearTimeout(timerId);
-    reject(signal.reason);
-  }, { once: true });
-});
+const pause = (ms, signal) =>
+  new Promise((resolve, reject) => {
+    if (signal?.aborted) {
+      reject(signal.reason);
+      return;
+    }
+    const timerId = setTimeout(resolve, ms);
+    signal?.addEventListener(
+      "abort",
+      () => {
+        clearTimeout(timerId);
+        reject(signal.reason);
+      },
+      { once: true },
+    );
+  });
 
 // Up to 3 repeats after the first request, waiting 0.5, 1 and 2 seconds. Each attempt has its own time limit.
 export async function requestWithRetry(url, { signal, onRetry, ...options } = {}) {
@@ -125,7 +137,10 @@ const addressOf = (path, params = {}) => {
 };
 
 export const getPosts = ({ query, userId, page = 1, limit = PAGE_SIZE, signal, onRetry } = {}) =>
-  requestWithRetry(addressOf("/posts", { q: query, userId, _page: page, _limit: limit }), { signal, onRetry });
+  requestWithRetry(addressOf("/posts", { q: query, userId, _page: page, _limit: limit }), {
+    signal,
+    onRetry,
+  });
 
 export const getUsers = ({ signal } = {}) => requestWithRetry(addressOf("/users"), { signal });
 
@@ -145,8 +160,10 @@ export const getCurator = async (userId, { signal } = {}) => {
 
 // A sentence for the error state. The code of the answer stays in it.
 export const explain = (error) => {
-  if (error.name === "TimeoutError") return `The server did not answer within ${TIME_LIMIT / 1000} seconds. The waiting time is over.`;
+  if (error.name === "TimeoutError")
+    return `The server did not answer within ${TIME_LIMIT / 1000} seconds. The waiting time is over.`;
   if (error instanceof ApiError) return `The server answered with an error: ${error.message}.`;
-  if (error instanceof TypeError) return "The server cannot be reached. Check the connection and try again.";
+  if (error instanceof TypeError)
+    return "The server cannot be reached. Check the connection and try again.";
   return `The request failed: ${error.message}.`;
 };

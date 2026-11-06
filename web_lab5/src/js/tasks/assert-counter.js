@@ -24,21 +24,24 @@ const report = () => {
   const rows = [...results].map(([task, { checks, failed }]) => ({ task, checks, failed }));
   const checks = rows.reduce((sum, row) => sum + row.checks, 0);
   const failed = rows.reduce((sum, row) => sum + row.failed, 0);
-  const summary = failed === 0
-    ? `All ${checks} checks passed in ${rows.length} tasks`
-    : `${failed} of ${checks} checks failed, see the console`;
+  const summary =
+    failed === 0
+      ? `All ${checks} checks passed in ${rows.length} tasks`
+      : `${failed} of ${checks} checks failed, see the console`;
 
   console.table(rows);
   console.log(summary);
 
   const body = document.querySelector("#results");
-  body.replaceChildren(...rows.map(({ task, checks: count, failed: bad }) => {
-    const row = document.createElement("tr");
-    addCell(row, task);
-    addCell(row, String(count));
-    addCell(row, String(bad));
-    return row;
-  }));
+  body.replaceChildren(
+    ...rows.map(({ task, checks: count, failed: bad }) => {
+      const row = document.createElement("tr");
+      addCell(row, task);
+      addCell(row, String(count));
+      addCell(row, String(bad));
+      return row;
+    }),
+  );
   document.querySelector("#summary").textContent = summary;
 };
 

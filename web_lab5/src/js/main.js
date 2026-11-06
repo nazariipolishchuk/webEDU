@@ -9,10 +9,16 @@ const LOAD_NOTICES = {
 };
 
 const { items, condition } = storage.load();
-const view = { status: "all", selection: "all", sort: "title-asc", ...storage.loadView(), query: "" };
+const view = {
+  status: "all",
+  selection: "all",
+  sort: "title-asc",
+  ...storage.loadView(),
+  query: "",
+};
 const state = { items, view, editingId: null };
 
 if (condition !== "ok") storage.save(items);
-events.bind(state);   // first: it replaces saved view values that are no longer valid
+events.bind(state); // first: it replaces saved view values that are no longer valid
 render.all(state);
 if (LOAD_NOTICES[condition]) render.notice(LOAD_NOTICES[condition]);

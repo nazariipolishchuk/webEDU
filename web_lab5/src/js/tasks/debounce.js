@@ -4,9 +4,9 @@ import { counter } from "./assert-counter.js";
 const assert = counter("debounce");
 
 const debounce = (fn, delay) => {
-  let timerId;                              // shared by all calls of the wrapper
+  let timerId; // shared by all calls of the wrapper
   return (...args) => {
-    clearTimeout(timerId);                  // cancel the call planned earlier
+    clearTimeout(timerId); // cancel the call planned earlier
     timerId = setTimeout(() => fn(...args), delay);
   };
 };

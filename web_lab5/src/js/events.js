@@ -13,7 +13,8 @@ const MESSAGES = {
   },
   code: {
     valueMissing: "Enter the dataset code.",
-    patternMismatch: "Use 2 to 4 capital letters, a hyphen and 3 to 5 digits, for example CXR-1001.",
+    patternMismatch:
+      "Use 2 to 4 capital letters, a hyphen and 3 to 5 digits, for example CXR-1001.",
   },
   modality: {
     valueMissing: "Choose the scan type.",
@@ -34,13 +35,22 @@ const MESSAGES = {
   },
 };
 
-const FLAGS = ["valueMissing", "badInput", "patternMismatch", "tooShort", "stepMismatch", "rangeUnderflow", "rangeOverflow"];
+const FLAGS = [
+  "valueMissing",
+  "badInput",
+  "patternMismatch",
+  "tooShort",
+  "stepMismatch",
+  "rangeUnderflow",
+  "rangeOverflow",
+];
 
 const toKopiykas = (value) => Math.round(Number(value) * 100);
 
 // Rules the browser cannot express with attributes
 const customMessage = (field, items) => {
-  if (field.name === "title" && field.value.trim().length < MIN_TITLE) return MESSAGES.title.tooShort;
+  if (field.name === "title" && field.value.trim().length < MIN_TITLE)
+    return MESSAGES.title.tooShort;
   if (field.name === "code" && items.some((item) => item.code === field.value)) {
     return `Code ${field.value} is already in the catalogue.`;
   }
@@ -51,7 +61,9 @@ const validateField = (field, items) => {
   if (field.name === "code") field.value = field.value.trim().toUpperCase();
   field.setCustomValidity(""); // otherwise the previous custom error keeps the field invalid
   const flag = FLAGS.find((name) => field.validity[name]);
-  const message = flag ? (MESSAGES[field.name]?.[flag] ?? field.validationMessage) : customMessage(field, items);
+  const message = flag
+    ? (MESSAGES[field.name]?.[flag] ?? field.validationMessage)
+    : customMessage(field, items);
   field.setCustomValidity(message);
   render.fieldError(field, message);
   return field.checkValidity();
@@ -65,7 +77,8 @@ const validateFields = (fields, items) => {
 };
 
 const commit = (state) => {
-  if (!storage.save(state.items)) render.notice("Changes are not saved: the browser storage is full or blocked.");
+  if (!storage.save(state.items))
+    render.notice("Changes are not saved: the browser storage is full or blocked.");
   render.all(state);
 };
 
@@ -80,17 +93,20 @@ const bindForm = (state) => {
 
     const data = new FormData(form);
     const title = String(data.get("title")).trim();
-    state.items = [{
-      id: crypto.randomUUID(),
-      code: String(data.get("code")),
-      title,
-      modality: String(data.get("modality")),
-      status: String(data.get("status")),
-      quantity: Number(data.get("quantity")),
-      price: toKopiykas(data.get("price")),
-      selected: false,
-      text: String(data.get("text")).trim(),
-    }, ...state.items];
+    state.items = [
+      {
+        id: crypto.randomUUID(),
+        code: String(data.get("code")),
+        title,
+        modality: String(data.get("modality")),
+        status: String(data.get("status")),
+        quantity: Number(data.get("quantity")),
+        price: toKopiykas(data.get("price")),
+        selected: false,
+        text: String(data.get("text")).trim(),
+      },
+      ...state.items,
+    ];
 
     commit(state);
     form.reset();
@@ -176,7 +192,13 @@ const removeItem = (state, id) => {
 const exportSelected = (state) => {
   const manifest = state.items
     .filter((item) => item.selected)
-    .map(({ code, title, modality, quantity, price }) => ({ code, title, modality, scans: quantity, pricePerScan: price / 100 }));
+    .map(({ code, title, modality, quantity, price }) => ({
+      code,
+      title,
+      modality,
+      scans: quantity,
+      pricePerScan: price / 100,
+    }));
 
   if (manifest.length === 0) {
     render.notice("Select at least one dataset to export.");
@@ -223,7 +245,9 @@ const resetView = (state) => {
   state.view.query = "";
   state.view.status = "all";
   state.view.selection = "all";
-  Object.entries(VIEW_CONTROLS).forEach(([name, control]) => { control.value = state.view[name]; });
+  Object.entries(VIEW_CONTROLS).forEach(([name, control]) => {
+    control.value = state.view[name];
+  });
   storage.saveView(state.view);
   render.all(state);
 };
@@ -257,7 +281,9 @@ const bindToolbar = (state) => {
     state.items = [];
     state.editingId = null;
     render.all(state);
-    offerUndo(state, "Saved data cleared.", () => { state.items = items; });
+    offerUndo(state, "Saved data cleared.", () => {
+      state.items = items;
+    });
   });
 };
 

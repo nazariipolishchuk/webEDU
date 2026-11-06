@@ -1,5 +1,13 @@
 // js/app.js: the application logic. Keeps the state, runs requests, decides which state to show.
-import { explain, getComments, getCurator, getPosts, getUsers, PAGE_SIZE, useServer } from "./api.js";
+import {
+  explain,
+  getComments,
+  getCurator,
+  getPosts,
+  getUsers,
+  PAGE_SIZE,
+  useServer,
+} from "./api.js";
 import * as view from "./api-view.js";
 import { describeAge, loadResult, saveResult } from "./cache.js";
 import { debounce, showApiAddress } from "./utils.js";
@@ -21,11 +29,11 @@ const state = {
   savedAt: 0,
 };
 
-let controller = null;        // cancels the request in progress
-let lastMode = "new";         // what the Retry button repeats
-let detailController = null;  // cancels the requests of the dialog
-let outdated = null;          // a saved copy too old to show at start, offered if the request fails
-let keptAction = null;        // what the second button of the error state does
+let controller = null; // cancels the request in progress
+let lastMode = "new"; // what the Retry button repeats
+let detailController = null; // cancels the requests of the dialog
+let outdated = null; // a saved copy too old to show at start, offered if the request fails
+let keptAction = null; // what the second button of the error state does
 
 const ageOf = (savedAt) => describeAge(Date.now() - savedAt);
 
@@ -49,9 +57,16 @@ const fetchMatching = async (startPage, limit, signal) => {
   };
   const found = [];
   for (let page = startPage; ; page++) {
-    const batch = await getPosts({ query: state.query, userId: state.userId, page, limit, signal, onRetry });
+    const batch = await getPosts({
+      query: state.query,
+      userId: state.userId,
+      page,
+      limit,
+      signal,
+      onRetry,
+    });
     found.push(...batch.filter(matchesTitle));
-    const exhausted = batch.length < limit;  // judged by the server's answer, not by the matches
+    const exhausted = batch.length < limit; // judged by the server's answer, not by the matches
     if (exhausted || found.length > 0) return { found, page, hasMore: !exhausted };
   }
 };
@@ -130,7 +145,7 @@ const keptOption = (mode) => {
 };
 
 async function load(mode) {
-  controller?.abort();                       // cancel the previous request
+  controller?.abort(); // cancel the previous request
   controller = new AbortController();
   const { signal } = controller;
   lastMode = mode;
@@ -150,14 +165,18 @@ async function load(mode) {
     state.savedAt = Date.now();
     outdated = null;
     saveResult(state);
-    view.setSource(`Live data from the API, loaded at ${new Date().toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })}.`);
+    view.setSource(
+      `Live data from the API, loaded at ${new Date().toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })}.`,
+    );
     showResult();
   } catch (error) {
     if (error.name === "AbortError") return; // cancelled by a newer request: not a failure
 
     // The list on the page is still good, so a failed update does not take it away
     if (mode === "refresh" && state.posts.length > 0) {
-      view.setSource(`Could not update. ${explain(error)} Showing the copy from ${ageOf(state.savedAt)}.`);
+      view.setSource(
+        `Could not update. ${explain(error)} Showing the copy from ${ageOf(state.savedAt)}.`,
+      );
       showResult();
       return;
     }
@@ -199,7 +218,7 @@ async function loadDetails(post) {
     getCurator(post.userId, { signal }),
     getComments(post.id, { signal }),
   ]);
-  if (signal.aborted) return;                // the dialog was closed or another publication was opened
+  if (signal.aborted) return; // the dialog was closed or another publication was opened
 
   if (curator.status === "fulfilled") {
     const onShowAll = state.users.has(post.userId) ? () => showCuratorPosts(post.userId) : null;
@@ -222,7 +241,7 @@ document.querySelector("#server").addEventListener("change", (event) => {
 });
 
 document.querySelector("#controls").addEventListener("submit", (event) => {
-  event.preventDefault();  // Enter searches at once
+  event.preventDefault(); // Enter searches at once
   search();
 });
 
@@ -245,13 +264,15 @@ document.querySelector("#publication-list").addEventListener("click", (event) =>
 const dialog = document.querySelector("#publication");
 document.querySelector("#publication-close").addEventListener("click", () => dialog.close());
 dialog.addEventListener("click", (event) => {
-  if (event.target === dialog) dialog.close();  // a click on the backdrop
+  if (event.target === dialog) dialog.close(); // a click on the backdrop
 });
 dialog.addEventListener("close", () => detailController?.abort());
 
 document.querySelector("#show-more").addEventListener("click", () => load("more"));
 document.querySelector("#retry").addEventListener("click", () => load(lastMode));
-document.querySelector("#refresh").addEventListener("click", () => load(state.posts.length > 0 ? "refresh" : "new"));
+document
+  .querySelector("#refresh")
+  .addEventListener("click", () => load(state.posts.length > 0 ? "refresh" : "new"));
 document.querySelector("#show-kept").addEventListener("click", () => keptAction?.());
 
 // Start: a fresh copy is shown at once and updated, an old one only stays in reserve
@@ -271,7 +292,9 @@ if (saved?.fresh) {
 } else {
   if (saved) {
     outdated = saved;
-    view.setSource(`The saved copy from ${ageOf(saved.savedAt)} is out of date, so the list is loaded again.`);
+    view.setSource(
+      `The saved copy from ${ageOf(saved.savedAt)} is out of date, so the list is loaded again.`,
+    );
   }
   load("new");
 }

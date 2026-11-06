@@ -25,7 +25,7 @@ const list = $("#publication-list");
 const panels = { loading: $("#state-loading"), error: $("#state-error"), empty: $("#state-empty") };
 const showMore = $("#show-more");
 const busyControls = [$("#refresh"), showMore, $("#filter-curator"), $("#server")];
-let focusBack = null;  // a control that lost the keyboard focus by being switched off
+let focusBack = null; // a control that lost the keyboard focus by being switched off
 
 const createImage = (post) => {
   const { key } = scanTypeOf(post);
@@ -83,10 +83,16 @@ export const showState = (state, { keepList = false } = {}) => {
 
   // The search field stays on: typing during a request is what cancels that request
   const busy = state === "loading";
-  if (busy && busyControls.includes(document.activeElement) && document.activeElement !== showMore) {
+  if (
+    busy &&
+    busyControls.includes(document.activeElement) &&
+    document.activeElement !== showMore
+  ) {
     focusBack = document.activeElement;
   }
-  busyControls.forEach((control) => { control.disabled = busy; });
+  busyControls.forEach((control) => {
+    control.disabled = busy;
+  });
   if (!busy) {
     focusBack?.focus();
     focusBack = null;
@@ -100,7 +106,9 @@ export const setPaging = ({ hasMore, count }) => {
 
 export const hidePaging = () => setPaging({ hasMore: false, count: 0 });
 
-export const setLoadingText = (text) => { $("#loading-text").textContent = text; };
+export const setLoadingText = (text) => {
+  $("#loading-text").textContent = text;
+};
 
 export const setError = (text, keptLabel = "") => {
   $("#error-text").textContent = text;
@@ -111,14 +119,21 @@ export const setError = (text, keptLabel = "") => {
 export const focusRetry = () => $("#retry").focus();
 
 export const setEmpty = (query) => {
-  $("#empty-title").textContent = query ? `No publications with “${query}” in the title` : "No publications found";
+  $("#empty-title").textContent = query
+    ? `No publications with “${query}” in the title`
+    : "No publications found";
 };
 
-export const setSource = (text) => { $("#source").textContent = text; };
+export const setSource = (text) => {
+  $("#source").textContent = text;
+};
 
 export const fillCurators = (users, selected) => {
   const select = $("#filter-curator");
-  select.replaceChildren(new Option("All curators", ""), ...[...users.values()].map((user) => new Option(user.name, user.id)));
+  select.replaceChildren(
+    new Option("All curators", ""),
+    ...[...users.values()].map((user) => new Option(user.name, user.id)),
+  );
   select.value = selected;
 };
 
@@ -186,15 +201,17 @@ export const renderComments = (comments) => {
     return;
   }
   const items = createEl("ul", "comments");
-  items.append(...comments.map((comment) => {
-    const item = createEl("li", "comment");
-    item.append(
-      createEl("p", "comment__title", comment.name),
-      createEl("p", "comment__author", comment.email),
-      createEl("p", "comment__text", comment.body),
-    );
-    return item;
-  }));
+  items.append(
+    ...comments.map((comment) => {
+      const item = createEl("li", "comment");
+      item.append(
+        createEl("p", "comment__title", comment.name),
+        createEl("p", "comment__author", comment.email),
+        createEl("p", "comment__text", comment.body),
+      );
+      return item;
+    }),
+  );
   commentsBox.replaceChildren(items);
 };
 

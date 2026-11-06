@@ -37,7 +37,7 @@ const source = { id: 1, nested: { list: [1, { deep: true }, [2, 3]] }, title: "s
 const snapshot = JSON.stringify(source);
 
 const clone01 = structuredClone(source); // built-in deep copy
-const clone = deepClone(source);         // own implementation
+const clone = deepClone(source); // own implementation
 
 assert(JSON.stringify(clone) === JSON.stringify(clone01), "Clone does not match structuredClone");
 assert(JSON.stringify(clone) === snapshot, "String forms of the source and the copy should match");
@@ -67,9 +67,15 @@ assert(richClone.created !== rich.created, "Date should be a new object");
 assert(richClone.created.getTime() === richBuiltIn.created.getTime(), "Date value should match");
 assert(richClone.tags instanceof Map, "Map should stay a Map");
 assert(richClone.tags.get("modality").name === "xray", "Map values should be copied");
-assert(richClone.tags.get("modality") !== rich.tags.get("modality"), "Map values should be deep copies");
+assert(
+  richClone.tags.get("modality") !== rich.tags.get("modality"),
+  "Map values should be deep copies",
+);
 assert(richClone.codes instanceof Set && richClone.codes.has(2), "Set should stay a Set");
-assert("missing" in richClone && richClone.missing === undefined, "undefined properties should be kept");
+assert(
+  "missing" in richClone && richClone.missing === undefined,
+  "undefined properties should be kept",
+);
 assert(richClone.pattern.flags === rich.pattern.flags, "RegExp flags should be kept");
 
 // Decided behaviour on a cycle: the copy has the same cycle, as with structuredClone
@@ -84,13 +90,20 @@ try {
 } catch (error) {
   jsonError = error.name;
 }
-assert(jsonError === "TypeError", "JSON.stringify should reject a cycle, so it cannot check this case");
+assert(
+  jsonError === "TypeError",
+  "JSON.stringify should reject a cycle, so it cannot check this case",
+);
 assert(cyclicClone !== cyclic, "The cyclic copy should be a new object");
 assert(cyclicClone.child.parent === cyclicClone, "The cycle should point at the copy");
 assert(cyclicBuiltIn.child.parent === cyclicBuiltIn, "structuredClone should behave the same way");
 
 // Difference from structuredClone: functions are shared instead of rejected
-const withFunction = { run() { return 1; } };
+const withFunction = {
+  run() {
+    return 1;
+  },
+};
 assert(deepClone(withFunction).run === withFunction.run, "Functions should be shared by reference");
 let builtInError = "";
 try {

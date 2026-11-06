@@ -29,8 +29,12 @@ assert(addOnce() === 5, "Arguments of later calls should be ignored");
 assert(calls === 0, "The function should not run again");
 
 let runs = 0;
-const first = once(() => { runs++; });
-const other = once(() => { runs++; });
+const first = once(() => {
+  runs++;
+});
+const other = once(() => {
+  runs++;
+});
 first();
 first();
 other();

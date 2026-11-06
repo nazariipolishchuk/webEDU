@@ -18,8 +18,8 @@ const arr = [
 const expensive = (item) => item.price > 1000;
 const snapshot = JSON.stringify(arr);
 
-const find01 = arr.find(expensive);   // built-in find
-const find02 = find(arr, expensive);  // own implementation
+const find01 = arr.find(expensive); // built-in find
+const find02 = find(arr, expensive); // own implementation
 
 assert(find01 === find02, "Find01 does not match Find02");
 assert(find02.id === 2, "The first match should be returned");
@@ -31,7 +31,10 @@ assert(find(arr, missing) === arr.find(missing), "No match should agree with the
 assert(find([], expensive) === undefined, "Empty array should give undefined");
 
 let calls = 0;
-find(arr, (item) => { calls++; return item.id === 1; });
+find(arr, (item) => {
+  calls++;
+  return item.id === 1;
+});
 assert(calls === 1, "Search should stop at the first match");
 
 assert(find([3, 0, 5], (val) => val === 0) === 0, "A falsy element should still be found");
