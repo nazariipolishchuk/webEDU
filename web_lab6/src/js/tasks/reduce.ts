@@ -1,14 +1,24 @@
 // Your custom Reduce
-import { counter } from "./assert-counter.js";
+import { counter } from "./assert-counter.ts";
 
 const assert = counter("reduce");
 
-// Rest parameter: it tells "no initial value" apart from an explicit undefined
-const reduce = (arr, fn, ...initial) => {
-  let i = 0;
-  let retValue;
+type Reducer<A, T> = (accumulator: A, value: T, index: number, array: readonly T[]) => A;
 
-  if (initial.length > 0) {
+// Overloads, as the built-in has: without an initial value the accumulator is an element (T),
+// with one it may be of any type A. The implementation below is not visible from outside.
+function reduce<T>(arr: readonly T[], fn: Reducer<T, T>): T;
+function reduce<T, A>(arr: readonly T[], fn: Reducer<A, T>, initial: A): A;
+// Rest parameter: it tells "no initial value" apart from an explicit undefined
+function reduce(
+  arr: readonly unknown[],
+  fn: Reducer<unknown, unknown>,
+  ...initial: [] | [unknown]
+): unknown {
+  let i = 0;
+  let retValue: unknown;
+
+  if (initial.length === 1) {
     retValue = initial[0];
   } else {
     while (i < arr.length && !(i in arr)) i++;
@@ -20,20 +30,21 @@ const reduce = (arr, fn, ...initial) => {
     if (i in arr) retValue = fn(retValue, arr[i], i, arr);
   }
   return retValue;
-};
+}
 
-const errorName = (run) => {
+const errorName = (run: () => unknown) => {
   try {
     run();
     return "no error";
   } catch (error) {
-    return error.name;
+    return error instanceof Error ? error.name : "not an Error";
   }
 };
 
 const arr = [1, 2, 3, 4];
-const sum = (accumulator, val) => accumulator + val;
-const subtract = (accumulator, val) => accumulator - val;
+const empty: number[] = [];
+const sum = (accumulator: number, val: number) => accumulator + val;
+const subtract = (accumulator: number, val: number) => accumulator - val;
 
 const sum01 = arr.reduce(sum, 0); // built-in reduce
 const sum02 = reduce(arr, sum, 0); // own implementation
@@ -49,9 +60,12 @@ assert(
   "Order of folding should match the built-in",
 );
 
-assert(reduce([], sum, 7) === [].reduce(sum, 7), "Empty array should return the initial value");
 assert(
-  errorName(() => reduce([], sum)) === errorName(() => [].reduce(sum)),
+  reduce(empty, sum, 7) === empty.reduce(sum, 7),
+  "Empty array should return the initial value",
+);
+assert(
+  errorName(() => reduce(empty, sum)) === errorName(() => empty.reduce(sum)),
   "Empty array without an initial value should throw TypeError",
 );
 
@@ -66,8 +80,8 @@ assert(
   "Explicit undefined counts as an initial value",
 );
 
-const indexes = [];
-reduce(arr, (acc, val, i) => {
+const indexes: number[] = [];
+reduce(arr, (acc, _val, i) => {
   indexes.push(i);
   return acc;
 });

@@ -1,10 +1,13 @@
 // Your custom DeepClone
-import { counter } from "./assert-counter.js";
+import { counter } from "./assert-counter.ts";
 
 const assert = counter("deep-clone");
 
-// seen maps every source object to its copy: this is what makes cycles safe
-const deepClone = (value, seen = new WeakMap()) => {
+type Copyable = Record<PropertyKey, unknown>;
+
+// The walk sees values of every type, so inside it they are unknown.
+// seen maps every source object to its copy: this is what makes cycles safe.
+const cloneValue = (value: unknown, seen: WeakMap<object, unknown>): unknown => {
   if (value === null || typeof value !== "object") return value; // primitives and functions
   if (seen.has(value)) return seen.get(value);
 
@@ -12,28 +15,41 @@ const deepClone = (value, seen = new WeakMap()) => {
   if (value instanceof RegExp) return new RegExp(value.source, value.flags);
 
   if (value instanceof Map) {
-    const copy = new Map();
+    const copy = new Map<unknown, unknown>();
     seen.set(value, copy);
-    value.forEach((val, key) => copy.set(deepClone(key, seen), deepClone(val, seen)));
+    value.forEach((val: unknown, key: unknown) =>
+      copy.set(cloneValue(key, seen), cloneValue(val, seen)),
+    );
     return copy;
   }
 
   if (value instanceof Set) {
-    const copy = new Set();
+    const copy = new Set<unknown>();
     seen.set(value, copy);
-    value.forEach((val) => copy.add(deepClone(val, seen)));
+    value.forEach((val: unknown) => copy.add(cloneValue(val, seen)));
     return copy;
   }
 
-  const copy = Array.isArray(value) ? [] : Object.create(Object.getPrototypeOf(value));
+  const source = value as Copyable;
+  const prototype = Object.getPrototypeOf(value) as object | null;
+  const copy = (Array.isArray(value) ? [] : Object.create(prototype)) as Copyable;
   seen.set(value, copy);
   for (const key of Reflect.ownKeys(value)) {
-    copy[key] = deepClone(value[key], seen);
+    copy[key] = cloneValue(source[key], seen);
   }
   return copy;
 };
 
-const source = { id: 1, nested: { list: [1, { deep: true }, [2, 3]] }, title: "scan" };
+// The copy has the type of the source: T in, T out
+const deepClone = <T>(value: T): T => cloneValue(value, new WeakMap()) as T;
+
+interface Source {
+  id: number;
+  nested: { list: [number, { deep: boolean }, number[]] };
+  title: string;
+}
+
+const source: Source = { id: 1, nested: { list: [1, { deep: true }, [2, 3]] }, title: "scan" };
 const snapshot = JSON.stringify(source);
 
 const clone01 = structuredClone(source); // built-in deep copy
@@ -66,7 +82,7 @@ assert(richClone.created instanceof Date, "Date should stay a Date");
 assert(richClone.created !== rich.created, "Date should be a new object");
 assert(richClone.created.getTime() === richBuiltIn.created.getTime(), "Date value should match");
 assert(richClone.tags instanceof Map, "Map should stay a Map");
-assert(richClone.tags.get("modality").name === "xray", "Map values should be copied");
+assert(richClone.tags.get("modality")?.name === "xray", "Map values should be copied");
 assert(
   richClone.tags.get("modality") !== rich.tags.get("modality"),
   "Map values should be deep copies",
@@ -79,16 +95,23 @@ assert(
 assert(richClone.pattern.flags === rich.pattern.flags, "RegExp flags should be kept");
 
 // Decided behaviour on a cycle: the copy has the same cycle, as with structuredClone
-const cyclic = { name: "root", child: {} };
+interface Tree {
+  name: string;
+  child: { parent?: Tree };
+}
+
+const cyclic: Tree = { name: "root", child: {} };
 cyclic.child.parent = cyclic;
 const cyclicClone = deepClone(cyclic);
 const cyclicBuiltIn = structuredClone(cyclic);
+
+const errorName = (error: unknown) => (error instanceof Error ? error.name : "not an Error");
 
 let jsonError = "";
 try {
   JSON.stringify(cyclic);
 } catch (error) {
-  jsonError = error.name;
+  jsonError = errorName(error);
 }
 assert(
   jsonError === "TypeError",
@@ -100,16 +123,14 @@ assert(cyclicBuiltIn.child.parent === cyclicBuiltIn, "structuredClone should beh
 
 // Difference from structuredClone: functions are shared instead of rejected
 const withFunction = {
-  run() {
-    return 1;
-  },
+  run: () => 1,
 };
 assert(deepClone(withFunction).run === withFunction.run, "Functions should be shared by reference");
 let builtInError = "";
 try {
   structuredClone(withFunction);
 } catch (error) {
-  builtInError = error.name;
+  builtInError = errorName(error);
 }
 assert(builtInError === "DataCloneError", "structuredClone should reject functions");
 
