@@ -1,17 +1,29 @@
-// js/storage.js: reads and writes the catalogue in localStorage, holds the sample data.
-import { read, write } from "./utils.js";
+// js/storage.ts: reads and writes the catalogue in localStorage, holds the sample data.
+import { isKeyOf, isRecord } from "./guards.ts";
+import type {
+  Dataset,
+  DatasetStatus,
+  LoadCondition,
+  Modality,
+  SavedView,
+  SelectionFilter,
+  SortKey,
+  StatusFilter,
+} from "./types.ts";
+import { read, write } from "./utils.ts";
 
 const ITEMS_KEY = "drannotation-datasets";
 const VIEW_KEY = "drannotation-view";
 
-const STATUSES = {
+// Record<K, V>: every status must have a name, a missing or a misspelled one does not compile
+const STATUSES: Record<DatasetStatus, string> = {
   ready: "Ready for training",
   collecting: "Collecting",
   review: "In review",
 };
 
 // Scan type: the image file name and its text alternative
-const MODALITIES = {
+const MODALITIES: Record<Modality, string> = {
   "chest-xray": "Chest X-ray with a box drawn around consolidation in the right lower lobe",
   "brain-mri": "Axial brain MRI slice with a glioma outlined",
   ecg: "ECG strip with irregular beats marked as atrial fibrillation",
@@ -22,8 +34,39 @@ const MODALITIES = {
   "bone-xray": "Wrist X-ray with a distal radius fracture boxed",
 };
 
+// The values the view settings may take, as tables: isKeyOf checks a stored value against them
+const SELECTIONS: Record<SelectionFilter, true> = {
+  all: true,
+  selected: true,
+  "not-selected": true,
+};
+const SORTS: Record<SortKey, true> = {
+  "title-asc": true,
+  "title-desc": true,
+  "price-asc": true,
+  "price-desc": true,
+  "quantity-desc": true,
+  "value-desc": true,
+};
+
+export const isStatusFilter = (value: unknown): value is StatusFilter =>
+  value === "all" || isKeyOf(STATUSES, value);
+export const isSelection = (value: unknown): value is SelectionFilter => isKeyOf(SELECTIONS, value);
+export const isSortKey = (value: unknown): value is SortKey => isKeyOf(SORTS, value);
+export const isDatasetStatus = (value: unknown): value is DatasetStatus => isKeyOf(STATUSES, value);
+export const isModality = (value: unknown): value is Modality => isKeyOf(MODALITIES, value);
+
 // Prices are whole kopiykas: 0.1 + 0.2 !== 0.3 must not reach the totals
-const dataset = (code, title, modality, status, quantity, price, selected, text) => ({
+const dataset = (
+  code: string,
+  title: string,
+  modality: Modality,
+  status: DatasetStatus,
+  quantity: number,
+  price: number,
+  selected: boolean,
+  text: string,
+): Dataset => ({
   id: `sample-${code}`,
   code,
   title,
@@ -35,7 +78,7 @@ const dataset = (code, title, modality, status, quantity, price, selected, text)
   text,
 });
 
-const sample = () => [
+const sample = (): Dataset[] => [
   dataset(
     "CXR-1001",
     "Chest X-ray: pneumonia",
@@ -118,46 +161,60 @@ const sample = () => [
   ),
 ];
 
+// Scans and kopiykas: whole numbers from zero up
+const isWholeAmount = (value: unknown): value is number =>
+  typeof value === "number" && Number.isInteger(value) && value >= 0;
+
 // The storage can be edited by hand, so nothing read from it is trusted
-const isDataset = (item) =>
-  item !== null &&
-  typeof item === "object" &&
+const isDataset = (item: unknown): item is Dataset =>
+  isRecord(item) &&
   typeof item.id === "string" &&
   item.id !== "" &&
   typeof item.code === "string" &&
   typeof item.title === "string" &&
   item.title.trim() !== "" &&
-  typeof item.text === "string" &&
-  Object.hasOwn(MODALITIES, item.modality) &&
-  Object.hasOwn(STATUSES, item.status) &&
-  Number.isInteger(item.quantity) &&
-  item.quantity >= 0 &&
-  Number.isInteger(item.price) &&
-  item.price >= 0 &&
+  (item.text === undefined || typeof item.text === "string") &&
+  isModality(item.modality) &&
+  isDatasetStatus(item.status) &&
+  isWholeAmount(item.quantity) &&
+  isWholeAmount(item.price) &&
   typeof item.selected === "boolean";
 
-// condition: ok | empty (nothing saved yet) | damaged (unreadable) | partial (bad records skipped)
-const load = () => {
-  const { missing, damaged, value } = read(ITEMS_KEY);
-  if (missing) return { items: sample(), condition: "empty" };
-  if (damaged || !Array.isArray(value)) return { items: sample(), condition: "damaged" };
+const load = (): { items: Dataset[]; condition: LoadCondition } => {
+  const stored = read(ITEMS_KEY);
+  if (stored.state === "missing") return { items: sample(), condition: "empty" };
+  if (stored.state === "damaged" || !Array.isArray(stored.value)) {
+    return { items: sample(), condition: "damaged" };
+  }
 
-  const items = value.filter(
-    (item, index) => isDataset(item) && value.findIndex((other) => other?.id === item.id) === index,
+  // Array.isArray narrowed the value to any[]: as unknown[] keeps every element unchecked
+  const value: unknown[] = stored.value;
+  const valid = value.filter(isDataset);
+  // A copied record with the same id would be edited and deleted together with the first one
+  const items = valid.filter(
+    (item, index) => valid.findIndex(({ id }) => id === item.id) === index,
   );
   return { items, condition: items.length === value.length ? "ok" : "partial" };
 };
 
-const save = (items) => write(ITEMS_KEY, items);
+const save = (items: Dataset[]): boolean => write(ITEMS_KEY, items);
 
-const loadView = () => {
-  const { value } = read(VIEW_KEY);
-  return value !== null && typeof value === "object" ? value : {};
+// Only the values the page offers are taken, the rest stay at their defaults
+const loadView = (): Partial<SavedView> => {
+  const stored = read(VIEW_KEY);
+  if (stored.state !== "found" || !isRecord(stored.value)) return {};
+  const { status, selection, sort } = stored.value;
+  const view: Partial<SavedView> = {};
+  if (isStatusFilter(status)) view.status = status;
+  if (isSelection(selection)) view.selection = selection;
+  if (isSortKey(sort)) view.sort = sort;
+  return view;
 };
 
-const saveView = ({ status, selection, sort }) => write(VIEW_KEY, { status, selection, sort });
+const saveView = ({ status, selection, sort }: SavedView): boolean =>
+  write(VIEW_KEY, { status, selection, sort });
 
-const clear = () => {
+const clear = (): void => {
   localStorage.removeItem(ITEMS_KEY);
   localStorage.removeItem(VIEW_KEY);
 };

@@ -1,6 +1,11 @@
-// js/render.js: turns the state into DOM nodes. User data only ever goes through textContent.
-import { scanImage } from "@/js/images.js";
-import { MODALITIES, STATUSES } from "./storage.js";
+// js/render.ts: turns the state into DOM nodes. User data only ever goes through textContent.
+import { scanImage } from "@/js/images.ts";
+import { MODALITIES, STATUSES } from "./storage.ts";
+import type { CatalogueState, Dataset, SelectionFilter, SortKey, StatusFilter } from "./types.ts";
+import { createButton, createEl, element } from "./utils.ts";
+
+// A form field of the catalogue: the add form and the edit card use these three
+export type Field = HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement;
 
 const moneyFormat = new Intl.NumberFormat("en-GB", {
   style: "currency",
@@ -9,28 +14,15 @@ const moneyFormat = new Intl.NumberFormat("en-GB", {
 });
 const numberFormat = new Intl.NumberFormat("en-GB");
 
-const money = (kopiykas) => moneyFormat.format(kopiykas / 100);
-const number = (value) => numberFormat.format(value);
-const valueOf = (item) => item.quantity * item.price;
-const totalValue = (items) => items.reduce((sum, item) => sum + valueOf(item), 0);
+const money = (kopiykas: number) => moneyFormat.format(kopiykas / 100);
+const number = (value: number) => numberFormat.format(value);
+const valueOf = (item: Dataset) => item.quantity * item.price;
+const totalValue = (items: Dataset[]) => items.reduce((sum, item) => sum + valueOf(item), 0);
 
 const NOTICE_TIME = 8000;
-const listNode = document.querySelector("#dataset-list");
+const listNode = element("#dataset-list", HTMLUListElement);
 
-const createEl = (tag, className, text = "") => {
-  const node = document.createElement(tag);
-  node.className = className;
-  node.textContent = text;
-  return node;
-};
-
-const createButton = (className, text) => {
-  const button = createEl("button", className, text);
-  button.type = "button";
-  return button;
-};
-
-const createImage = ({ modality }) => {
+const createImage = ({ modality }: Dataset) => {
   const image = createEl("img", "card__image");
   image.src = scanImage(modality);
   image.alt = MODALITIES[modality];
@@ -40,10 +32,10 @@ const createImage = ({ modality }) => {
   return image;
 };
 
-const createStatus = ({ status }) =>
+const createStatus = ({ status }: Dataset) =>
   createEl("span", `card__status card__status--${status}`, STATUSES[status]);
 
-const createLedger = (item) => {
+const createLedger = (item: Dataset) => {
   const ledger = createEl("p", "card__ledger");
   const sum = `${number(item.quantity)} scans × ${money(item.price)}`;
   ledger.append(
@@ -53,7 +45,7 @@ const createLedger = (item) => {
   return ledger;
 };
 
-const createActions = (item) => {
+const createActions = (item: Dataset) => {
   const actions = createEl("div", "card__actions");
 
   const toggle = createButton(
@@ -73,7 +65,7 @@ const createActions = (item) => {
   return actions;
 };
 
-const createField = (item, name, labelText, control) => {
+const createField = (item: Dataset, name: string, labelText: string, control: Field) => {
   const field = createEl("div", "field");
   const label = createEl("label", "field__label", labelText);
   const error = createEl("p", "field__error");
@@ -89,10 +81,15 @@ const createField = (item, name, labelText, control) => {
   return field;
 };
 
-const createInput = (properties) =>
+// Only these properties of an input are set here: a misspelled name does not compile
+type InputProps = Partial<
+  Pick<HTMLInputElement, "type" | "value" | "min" | "max" | "step" | "minLength" | "maxLength">
+>;
+
+const createInput = (properties: InputProps) =>
   Object.assign(document.createElement("input"), { required: true }, properties);
 
-const createStatusSelect = (item) => {
+const createStatusSelect = (item: Dataset) => {
   const select = document.createElement("select");
   select.append(...Object.entries(STATUSES).map(([value, text]) => new Option(text, value)));
   select.value = item.status;
@@ -100,7 +97,7 @@ const createStatusSelect = (item) => {
 };
 
 // In-place editing: the card itself turns into input fields
-const createEditCard = (item) => {
+const createEditCard = (item: Dataset) => {
   const card = createEl("li", "card card--editing");
   card.dataset.id = item.id;
 
@@ -149,7 +146,7 @@ const createEditCard = (item) => {
   return card;
 };
 
-const createCard = (item) => {
+const createCard = (item: Dataset) => {
   const card = createEl("li", `card${item.selected ? " card--selected" : ""}`);
   card.dataset.id = item.id;
   card.append(
@@ -157,14 +154,17 @@ const createCard = (item) => {
     createStatus(item),
     createEl("h3", "card__title", item.title),
     createEl("p", "card__code", item.code),
-    createEl("p", "card__text", item.text),
+    createEl("p", "card__text", item.text ?? ""),
     createLedger(item),
     createActions(item),
   );
   return card;
 };
 
-const COMPARE = {
+type Compare = (a: Dataset, b: Dataset) => number;
+
+// Record over SortKey: a sort option without a comparison does not compile
+const COMPARE: Record<SortKey, Compare> = {
   "title-asc": (a, b) => a.title.localeCompare(b.title),
   "title-desc": (a, b) => b.title.localeCompare(a.title),
   "price-asc": (a, b) => a.price - b.price,
@@ -173,24 +173,27 @@ const COMPARE = {
   "value-desc": (a, b) => valueOf(b) - valueOf(a),
 };
 
-const SELECTION = {
+const SELECTION: Record<SelectionFilter, (item: Dataset) => boolean> = {
   all: () => true,
   selected: (item) => item.selected,
   "not-selected": (item) => !item.selected,
 };
 
-const visibleItems = ({ items, view }) => {
+const matchesStatus = (item: Dataset, status: StatusFilter) =>
+  status === "all" || item.status === status;
+
+const visibleItems = ({ items, view }: Pick<CatalogueState, "items" | "view">) => {
   const query = view.query.trim().toLowerCase();
   const filtered = items.filter(
     (item) =>
       item.title.toLowerCase().includes(query) &&
-      (view.status === "all" || item.status === view.status) &&
+      matchesStatus(item, view.status) &&
       SELECTION[view.selection](item),
   );
   return [...filtered].sort(COMPARE[view.sort]); // a copy: state.items keeps its order
 };
 
-const createEmpty = (state) => {
+const createEmpty = (state: CatalogueState) => {
   const empty = createEl("li", "catalog__empty");
   if (state.items.length === 0) {
     empty.append(
@@ -210,10 +213,10 @@ const createEmpty = (state) => {
   return empty;
 };
 
-const list = (state) => {
+const list = (state: CatalogueState) => {
   // The card being edited is reused, so typed values survive a redraw of the list
-  const open = listNode.querySelector(".card--editing");
-  const build = (item) => {
+  const open = listNode.querySelector<HTMLLIElement>(".card--editing");
+  const build = (item: Dataset) => {
     if (item.id !== state.editingId) return createCard(item);
     return open?.dataset.id === item.id ? open : createEditCard(item);
   };
@@ -225,17 +228,19 @@ const list = (state) => {
 };
 
 // A redraw replaces the buttons, so the keyboard focus is put back by hand
-const focusInCard = (id, selector) => {
-  const card = [...listNode.children].find((node) => node.dataset.id === id);
-  card?.querySelector(selector)?.focus();
+const focusInCard = (id: string, selector: string): void => {
+  const card = [...listNode.children].find(
+    (node) => node instanceof HTMLElement && node.dataset.id === id,
+  );
+  card?.querySelector<HTMLElement>(selector)?.focus();
 };
 
-const setStat = (name, value, note) => {
-  document.querySelector(`#stat-${name}`).textContent = value;
-  document.querySelector(`#stat-${name}-note`).textContent = note;
+const setStat = (name: string, value: string, note: string) => {
+  element(`#stat-${name}`, HTMLElement).textContent = value;
+  element(`#stat-${name}-note`, HTMLElement).textContent = note;
 };
 
-const summary = (state) => {
+const summary = (state: CatalogueState) => {
   const scans = state.items.reduce((sum, item) => sum + item.quantity, 0);
   setStat("total", number(state.items.length), `${number(scans)} scans in total`);
   setStat("value", money(totalValue(state.items)), "scans × price per scan, all datasets");
@@ -247,28 +252,32 @@ const summary = (state) => {
   setStat("shown", number(shown.length), `worth ${money(totalValue(shown))}`);
 };
 
-const all = (state) => {
+const all = (state: CatalogueState): void => {
   list(state);
   summary(state);
 };
 
-const fieldError = (field, message) => {
-  field.closest(".field").querySelector(".field__error").textContent = message;
+const fieldError = (field: Field, message: string): void => {
+  const error = field.closest(".field")?.querySelector(".field__error");
+  if (error) error.textContent = message;
   if (message) field.setAttribute("aria-invalid", "true");
   else field.removeAttribute("aria-invalid");
 };
 
-let noticeTimer;
+let noticeTimer: ReturnType<typeof setTimeout> | undefined;
 
-const notice = (text, canUndo = false) => {
-  const box = document.querySelector("#notice");
-  document.querySelector("#notice-text").textContent = text;
-  document.querySelector("#notice-undo").hidden = !canUndo;
-  box.classList.add("notice--visible");
+const noticeBox = element("#notice", HTMLElement);
+const noticeText = element("#notice-text", HTMLElement);
+const noticeUndo = element("#notice-undo", HTMLButtonElement);
+
+const notice = (text: string, canUndo = false): void => {
+  noticeText.textContent = text;
+  noticeUndo.hidden = !canUndo;
+  noticeBox.classList.add("notice--visible");
   clearTimeout(noticeTimer);
   noticeTimer = setTimeout(() => {
-    box.classList.remove("notice--visible");
-    document.querySelector("#notice-undo").hidden = true;
+    noticeBox.classList.remove("notice--visible");
+    noticeUndo.hidden = true;
   }, NOTICE_TIME);
 };
 

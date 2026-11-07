@@ -1,15 +1,33 @@
-// js/events.js: event handlers and form validation.
-import * as render from "./render.js";
-import * as storage from "./storage.js";
-import { debounce } from "./utils.js";
+// js/events.ts: event handlers and form validation.
+import * as render from "./render.ts";
+import type { Field } from "./render.ts";
+import * as storage from "./storage.ts";
+import type { CatalogueState, Dataset, DatasetDraft, DatasetPatch, SavedView } from "./types.ts";
+import { debounce, element } from "./utils.ts";
 
 const MIN_TITLE = 3;
 const SEARCH_DELAY = 300;
 
-const MESSAGES = {
+// The flags of ValidityState in the order they are checked
+const FLAGS = [
+  "valueMissing",
+  "badInput",
+  "patternMismatch",
+  "tooShort",
+  "stepMismatch",
+  "rangeUnderflow",
+  "rangeOverflow",
+] as const satisfies readonly (keyof ValidityState)[];
+
+type Flag = (typeof FLAGS)[number];
+
+const TOO_SHORT = `Use at least ${MIN_TITLE} characters.`;
+
+// Partial: a field has messages only for the flags its attributes can raise
+const MESSAGES: Record<string, Partial<Record<Flag, string>>> = {
   title: {
     valueMissing: "Enter the dataset name.",
-    tooShort: `Use at least ${MIN_TITLE} characters.`,
+    tooShort: TOO_SHORT,
   },
   code: {
     valueMissing: "Enter the dataset code.",
@@ -35,29 +53,23 @@ const MESSAGES = {
   },
 };
 
-const FLAGS = [
-  "valueMissing",
-  "badInput",
-  "patternMismatch",
-  "tooShort",
-  "stepMismatch",
-  "rangeUnderflow",
-  "rangeOverflow",
-];
+const toKopiykas = (value: string) => Math.round(Number(value) * 100);
 
-const toKopiykas = (value) => Math.round(Number(value) * 100);
+const isField = (node: unknown): node is Field =>
+  node instanceof HTMLInputElement ||
+  node instanceof HTMLSelectElement ||
+  node instanceof HTMLTextAreaElement;
 
 // Rules the browser cannot express with attributes
-const customMessage = (field, items) => {
-  if (field.name === "title" && field.value.trim().length < MIN_TITLE)
-    return MESSAGES.title.tooShort;
+const customMessage = (field: Field, items: Dataset[]) => {
+  if (field.name === "title" && field.value.trim().length < MIN_TITLE) return TOO_SHORT;
   if (field.name === "code" && items.some((item) => item.code === field.value)) {
     return `Code ${field.value} is already in the catalogue.`;
   }
   return "";
 };
 
-const validateField = (field, items) => {
+const validateField = (field: Field, items: Dataset[]): boolean => {
   if (field.name === "code") field.value = field.value.trim().toUpperCase();
   field.setCustomValidity(""); // otherwise the previous custom error keeps the field invalid
   const flag = FLAGS.find((name) => field.validity[name]);
@@ -70,53 +82,68 @@ const validateField = (field, items) => {
 };
 
 // Every field is checked, so all errors show at once; the first one takes the focus
-const validateFields = (fields, items) => {
+const validateFields = (fields: Field[], items: Dataset[]) => {
   const invalid = fields.filter((field) => !validateField(field, items));
   invalid[0]?.focus();
   return invalid.length === 0;
 };
 
-const commit = (state) => {
+const commit = (state: CatalogueState) => {
   if (!storage.save(state.items))
     render.notice("Changes are not saved: the browser storage is full or blocked.");
   render.all(state);
 };
 
-const bindForm = (state) => {
-  const form = document.forms.dataset;
-  const fields = [...form.elements].filter((element) => element.matches("input, select, textarea"));
+// The add form gives strings. The fields have already been validated, so the select values are
+// among the options; the guards make that a fact for the compiler as well.
+const readDraft = (data: FormData): DatasetDraft | null => {
+  // A form entry is a string or a File: these fields are text, so anything else counts as empty
+  const text = (name: string) => {
+    const value = data.get(name);
+    return typeof value === "string" ? value.trim() : "";
+  };
+  const modality = text("modality");
+  const status = text("status");
+  if (!storage.isModality(modality) || !storage.isDatasetStatus(status)) return null;
 
-  form.addEventListener("submit", (event) => {
+  const draft: DatasetDraft = {
+    code: text("code"),
+    title: text("title"),
+    modality,
+    status,
+    quantity: Number(text("quantity")),
+    price: toKopiykas(text("price")),
+  };
+  const description = text("text");
+  if (description !== "") draft.text = description; // optional: an empty field adds no property
+  return draft;
+};
+
+const bindForm = (state: CatalogueState) => {
+  const form = element('form[name="dataset"]', HTMLFormElement);
+  const fields = [...form.elements].filter(isField);
+  const titleField = element('[name="title"]', HTMLInputElement, form);
+
+  form.addEventListener("submit", (event: SubmitEvent) => {
     event.preventDefault(); // the page must not reload
 
     if (!validateFields(fields, state.items)) return;
 
-    const data = new FormData(form);
-    const title = String(data.get("title")).trim();
-    state.items = [
-      {
-        id: crypto.randomUUID(),
-        code: String(data.get("code")),
-        title,
-        modality: String(data.get("modality")),
-        status: String(data.get("status")),
-        quantity: Number(data.get("quantity")),
-        price: toKopiykas(data.get("price")),
-        selected: false,
-        text: String(data.get("text")).trim(),
-      },
-      ...state.items,
-    ];
+    const draft = readDraft(new FormData(form));
+    if (!draft) return;
+    const item: Dataset = { id: crypto.randomUUID(), selected: false, ...draft };
+    state.items = [item, ...state.items];
 
     commit(state);
     form.reset();
-    form.elements.title.focus();
-    render.notice(`Added “${title}”.`);
+    titleField.focus();
+    render.notice(`Added “${item.title}”.`);
   });
 
   // A field marked as invalid is rechecked while the user corrects it
-  form.addEventListener("input", (event) => {
-    if (event.target.hasAttribute("aria-invalid")) validateField(event.target, state.items);
+  form.addEventListener("input", (event: Event) => {
+    const field = event.target;
+    if (isField(field) && field.hasAttribute("aria-invalid")) validateField(field, state.items);
   });
 
   form.addEventListener("reset", () => {
@@ -127,35 +154,37 @@ const bindForm = (state) => {
   });
 };
 
-const updateItem = (state, id, changes) => {
+const updateItem = (state: CatalogueState, id: string, changes: DatasetPatch) => {
   state.items = state.items.map((item) => (item.id === id ? { ...item, ...changes } : item));
 };
 
-const startEdit = (state, id) => {
+const startEdit = (state: CatalogueState, id: string) => {
   state.editingId = id;
   render.all(state);
   render.focusInCard(id, ".field__control");
 };
 
-const stopEdit = (state, id) => {
+const stopEdit = (state: CatalogueState, id: string) => {
   state.editingId = null;
   render.all(state);
   render.focusInCard(id, ".card__edit");
 };
 
-const saveEdit = (state, card) => {
-  const fields = [...card.querySelectorAll(".field__control")];
-  if (!validateFields(fields, state.items)) return;
-
-  const value = (name) => fields.find((field) => field.name === name).value;
+const saveEdit = (state: CatalogueState, card: HTMLElement) => {
+  const fields = [...card.querySelectorAll(".field__control")].filter(isField);
   const { id } = card.dataset;
+  if (id === undefined || !validateFields(fields, state.items)) return;
+
+  const value = (name: string) => fields.find((field) => field.name === name)?.value ?? "";
   const title = value("title").trim();
+  const status = value("status");
+  if (!storage.isDatasetStatus(status)) return;
 
   updateItem(state, id, {
     title,
     quantity: Number(value("quantity")),
     price: toKopiykas(value("price")),
-    status: value("status"),
+    status,
   });
   state.editingId = null;
   commit(state);
@@ -164,9 +193,9 @@ const saveEdit = (state, card) => {
 };
 
 // Instead of asking "are you sure?" before a change, the change can be taken back
-let undoLast = null;
+let undoLast: (() => void) | null = null;
 
-const offerUndo = (state, text, restore) => {
+const offerUndo = (state: CatalogueState, text: string, restore: () => void) => {
   undoLast = () => {
     restore();
     commit(state);
@@ -175,9 +204,10 @@ const offerUndo = (state, text, restore) => {
   render.notice(text, true);
 };
 
-const removeItem = (state, id) => {
+const removeItem = (state: CatalogueState, id: string) => {
   const index = state.items.findIndex((item) => item.id === id);
   const item = state.items[index];
+  if (!item) return; // the card is gone already: another tab may have deleted it
 
   state.items = state.items.filter((other) => other.id !== id);
   if (state.editingId === id) state.editingId = null;
@@ -189,7 +219,7 @@ const removeItem = (state, id) => {
   });
 };
 
-const exportSelected = (state) => {
+const exportSelected = (state: CatalogueState) => {
   const manifest = state.items
     .filter((item) => item.selected)
     .map(({ code, title, modality, quantity, price }) => ({
@@ -215,8 +245,8 @@ const exportSelected = (state) => {
 };
 
 // A write to localStorage in one tab fires "storage" in the other tabs
-const bindTabs = (state) => {
-  window.addEventListener("storage", (event) => {
+const bindTabs = (state: CatalogueState) => {
+  window.addEventListener("storage", (event: StorageEvent) => {
     if (event.key !== null && event.key !== storage.ITEMS_KEY) return;
 
     state.items = event.newValue === null ? [] : storage.load().items;
@@ -227,55 +257,79 @@ const bindTabs = (state) => {
 };
 
 const bindNotice = () => {
-  document.querySelector("#notice-undo").addEventListener("click", () => {
+  element("#notice-undo", HTMLButtonElement).addEventListener("click", () => {
     undoLast?.();
     undoLast = null;
   });
 };
 
-const VIEW_CONTROLS = {
-  status: document.querySelector("#filter-status"),
-  selection: document.querySelector("#filter-selection"),
-  sort: document.querySelector("#sort"),
+// Record over the keys of SavedView: one select for each saved setting, no more and no less
+const VIEW_CONTROLS: Record<keyof SavedView, HTMLSelectElement> = {
+  status: element("#filter-status", HTMLSelectElement),
+  selection: element("#filter-selection", HTMLSelectElement),
+  sort: element("#sort", HTMLSelectElement),
 };
-const searchInput = document.querySelector("#search");
+const searchInput = element("#search", HTMLInputElement);
 
-const resetView = (state) => {
+// The select value is a string: the guard of its setting narrows it to the type of that setting
+const VIEW_GUARDS: { [K in keyof SavedView]: (value: string) => value is SavedView[K] } = {
+  status: storage.isStatusFilter,
+  selection: storage.isSelection,
+  sort: storage.isSortKey,
+};
+
+const showView = (state: CatalogueState) => {
+  VIEW_CONTROLS.status.value = state.view.status;
+  VIEW_CONTROLS.selection.value = state.view.selection;
+  VIEW_CONTROLS.sort.value = state.view.sort;
+};
+
+const resetView = (state: CatalogueState) => {
   searchInput.value = "";
   state.view.query = "";
   state.view.status = "all";
   state.view.selection = "all";
-  Object.entries(VIEW_CONTROLS).forEach(([name, control]) => {
-    control.value = state.view[name];
-  });
+  showView(state);
   storage.saveView(state.view);
   render.all(state);
 };
 
-const bindToolbar = (state) => {
-  const applySearch = debounce((value) => {
+// K is one key of SavedView, so the guard and the value belong to the same setting
+const bindSetting = <K extends keyof SavedView>(state: CatalogueState, name: K) => {
+  const control = VIEW_CONTROLS[name];
+  const isValue = VIEW_GUARDS[name];
+  control.addEventListener("change", () => {
+    const { value } = control;
+    if (!isValue(value)) return;
+    const saved: SavedView = state.view; // the same object, seen as the saved part of the view
+    saved[name] = value;
+    storage.saveView(state.view);
+    render.all(state);
+  });
+};
+
+const bindToolbar = (state: CatalogueState) => {
+  const applySearch = debounce((value: string) => {
     state.view.query = value;
     render.all(state);
   }, SEARCH_DELAY);
 
-  searchInput.addEventListener("input", (event) => applySearch(event.target.value));
-
-  Object.entries(VIEW_CONTROLS).forEach(([name, control]) => {
-    // A value from the storage that is not among the options is ignored
-    control.value = state.view[name];
-    if (control.selectedIndex === -1) control.selectedIndex = 0;
-    state.view[name] = control.value;
-
-    control.addEventListener("change", () => {
-      state.view[name] = control.value;
-      storage.saveView(state.view);
-      render.all(state);
-    });
+  // For the input event the DOM library gives Event, so the field comes from currentTarget
+  searchInput.addEventListener("input", (event: Event) => {
+    const field = event.currentTarget as HTMLInputElement;
+    applySearch(field.value);
   });
 
-  document.querySelector("#export-selected").addEventListener("click", () => exportSelected(state));
+  showView(state); // the saved values were checked by storage.loadView
+  bindSetting(state, "status");
+  bindSetting(state, "selection");
+  bindSetting(state, "sort");
 
-  document.querySelector("#clear-storage").addEventListener("click", () => {
+  element("#export-selected", HTMLButtonElement).addEventListener("click", () =>
+    exportSelected(state),
+  );
+
+  element("#clear-storage", HTMLButtonElement).addEventListener("click", () => {
     const { items } = state;
     storage.clear();
     state.items = [];
@@ -287,12 +341,13 @@ const bindToolbar = (state) => {
   });
 };
 
-const bindList = (state) => {
-  const list = document.querySelector("#dataset-list");
+const bindList = (state: CatalogueState) => {
+  const list = element("#dataset-list", HTMLUListElement);
 
   // Event delegation: this one handler serves every button of every card,
   // including the cards created after it was attached
-  list.addEventListener("click", (event) => {
+  list.addEventListener("click", (event: MouseEvent) => {
+    if (!(event.target instanceof Element)) return;
     const button = event.target.closest("button");
     if (!button) return;
 
@@ -308,12 +363,13 @@ const bindList = (state) => {
       return;
     }
 
-    const card = button.closest(".card");
-    if (!card) return;
-    const { id } = card.dataset;
+    const card = button.closest<HTMLElement>(".card");
+    const id = card?.dataset.id;
+    if (!card || id === undefined) return;
 
     if (button.matches(".card__toggle")) {
       const item = state.items.find((other) => other.id === id);
+      if (!item) return;
       updateItem(state, id, { selected: !item.selected });
       commit(state);
       render.focusInCard(id, ".card__toggle");
@@ -329,25 +385,28 @@ const bindList = (state) => {
   });
 
   // Keyboard in the open card: Enter saves, Escape cancels
-  list.addEventListener("keydown", (event) => {
-    const card = event.target.closest(".card--editing");
-    if (!card) return;
+  list.addEventListener("keydown", (event: KeyboardEvent) => {
+    if (!(event.target instanceof Element)) return;
+    const card = event.target.closest<HTMLElement>(".card--editing");
+    const id = card?.dataset.id;
+    if (!card || id === undefined) return;
 
     if (event.key === "Escape") {
-      stopEdit(state, card.dataset.id);
-    } else if (event.key === "Enter" && event.target.matches("input")) {
+      stopEdit(state, id);
+    } else if (event.key === "Enter" && event.target instanceof HTMLInputElement) {
       // Saving moves the focus to the Edit button: this Enter must not press it
       event.preventDefault();
       saveEdit(state, card);
     }
   });
 
-  list.addEventListener("input", (event) => {
-    if (event.target.hasAttribute("aria-invalid")) validateField(event.target, state.items);
+  list.addEventListener("input", (event: Event) => {
+    const field = event.target;
+    if (isField(field) && field.hasAttribute("aria-invalid")) validateField(field, state.items);
   });
 };
 
-const bind = (state) => {
+const bind = (state: CatalogueState): void => {
   bindForm(state);
   bindToolbar(state);
   bindList(state);

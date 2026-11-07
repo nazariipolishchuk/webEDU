@@ -1,24 +1,30 @@
-// js/main.js: entry point of index.html. Imports run first, so every module is ready here.
-import * as events from "./events.js";
-import * as render from "./render.js";
-import * as storage from "./storage.js";
+// js/main.ts: entry point of index.html. Imports run first, so every module is ready here.
+import * as events from "./events.ts";
+import * as render from "./render.ts";
+import * as storage from "./storage.ts";
+import type { CatalogueState, LoadCondition } from "./types.ts";
 
-const LOAD_NOTICES = {
+// Partial: the conditions ok and empty need no notice
+const LOAD_NOTICES: Partial<Record<LoadCondition, string>> = {
   damaged: "The saved catalogue could not be read, so the sample datasets were loaded.",
   partial: "Some saved records were damaged and have been skipped.",
 };
 
 const { items, condition } = storage.load();
-const view = {
-  status: "all",
-  selection: "all",
-  sort: "title-asc",
-  ...storage.loadView(),
-  query: "",
+const state: CatalogueState = {
+  items,
+  view: {
+    status: "all",
+    selection: "all",
+    sort: "title-asc",
+    ...storage.loadView(), // only the saved values that are still valid
+    query: "",
+  },
+  editingId: null,
 };
-const state = { items, view, editingId: null };
 
 if (condition !== "ok") storage.save(items);
-events.bind(state); // first: it replaces saved view values that are no longer valid
+events.bind(state);
 render.all(state);
-if (LOAD_NOTICES[condition]) render.notice(LOAD_NOTICES[condition]);
+const loadNotice = LOAD_NOTICES[condition];
+if (loadNotice) render.notice(loadNotice);
