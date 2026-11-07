@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta name="description" content="Measurements and cross-origin checks of the DrAnnotation publications API." />
+        <title>DrAnnotation — network checks</title>
+        <link rel="icon" href="assets/img/logo.svg" type="image/svg+xml" />
+        <link rel="stylesheet" href="styles/main.scss" />
+        <link rel="stylesheet" href="styles/api.scss" />
+        <script type="module" src="js/network.ts"></script>
+    </head>
+    <body class="page">
+        <header class="header">
+            <a class="logo" href="index.html" aria-label="DrAnnotation home">
+                <img class="logo__mark" src="assets/img/logo.svg" alt="" width="40" height="40" />
+                <span class="logo__name">Dr</span><span class="logo__word">Annotation</span>
+            </a>
+
+            <nav class="nav" aria-label="Main">
+                <ul class="nav__list">
+                    <li class="nav__item"><a class="nav__link" href="index.html#overview">Overview</a></li>
+                    <li class="nav__item"><a class="nav__link" href="index.html#datasets">Datasets</a></li>
+                    <li class="nav__item"><a class="nav__link" href="api.html">Publications</a></li>
+                    <li class="nav__item">
+                        <a class="nav__link nav__link--active" href="network.html" aria-current="page">Network</a>
+                    </li>
+                </ul>
+            </nav>
+
+            <div class="header__actions">
+                <a class="button button--primary" href="index.html#add-dataset">Add a dataset</a>
+                <a class="button" href="index.html#profile">My profile</a>
+            </div>
+        </header>
+
+        <aside class="sidebar">
+            <div class="doctor">
+                <p class="doctor__name">Dr Olena Koval</p>
+                <p class="doctor__role">Consultant radiologist, Cherkasy</p>
+            </div>
+
+            <nav class="menu" aria-label="Sections of this page">
+                <ul class="menu__list">
+                    <li class="menu__item"><a class="menu__link" href="#speed">Speed</a></li>
+                    <li class="menu__item"><a class="menu__link" href="#failure">One request fails</a></li>
+                    <li class="menu__item"><a class="menu__link" href="#errors">Kinds of error</a></li>
+                    <li class="menu__item"><a class="menu__link" href="#cors">Cross-origin requests</a></li>
+                </ul>
+            </nav>
+        </aside>
+
+        <main class="content" id="overview">
+            <h1 class="content__title">Network checks</h1>
+            <p class="content__lead">
+                Run each check with the Network tab of the developer tools open. Every result below comes from real
+                requests to JSONPlaceholder.
+            </p>
+
+            <p class="file-warning" id="file-warning" hidden>
+                This page needs a local HTTP server. In the web_lab6 folder run <code>npm run dev</code> and open
+                <code>http://localhost:5173/network.html</code>.
+            </p>
+            <script>
+                if (location.protocol === "file:") document.getElementById("file-warning").hidden = false;
+            </script>
+
+            <section class="check" id="speed" aria-labelledby="speed-title">
+                <h2 class="section-title" id="speed-title">One after another, or all at once</h2>
+                <p class="check__text">
+                    Loads a curator, their publications and their albums. Three requests one after another, then the
+                    same three through <code>Promise.all</code>, five times over. The browser cache is off.
+                </p>
+                <button class="action action--primary" id="measure" type="button">Measure five runs</button>
+                <p class="check__status" id="measure-status" role="status"></p>
+                <div class="table-wrap">
+                    <table class="results" id="measure-table" hidden>
+                        <caption class="results__caption">
+                            Time to get all three resources, ms
+                        </caption>
+                        <thead>
+                            <tr>
+                                <th class="results__head" scope="col">Run</th>
+                                <th class="results__head results__head--number" scope="col">One after another</th>
+                                <th class="results__head results__head--number" scope="col">Promise.all</th>
+                            </tr>
+                        </thead>
+                        <tbody id="measure-rows"></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section class="check" id="failure" aria-labelledby="failure-title">
+                <h2 class="section-title" id="failure-title">When one request fails</h2>
+                <p class="check__text">
+                    The same three requests, but the middle one asks for <code>/posts/0</code>, which does not exist.
+                </p>
+                <button class="action action--primary" id="compare" type="button">Compare all and allSettled</button>
+                <div class="table-wrap">
+                    <table class="results" id="compare-table" hidden>
+                        <caption class="results__caption">
+                            What each method gives back
+                        </caption>
+                        <thead>
+                            <tr>
+                                <th class="results__head" scope="col">Method</th>
+                                <th class="results__head" scope="col">Result</th>
+                            </tr>
+                        </thead>
+                        <tbody id="compare-rows"></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section class="check" id="errors" aria-labelledby="errors-title">
+                <h2 class="section-title" id="errors-title">Kinds of error</h2>
+                <p class="check__text">
+                    The error name tells a cancelled request from a timeout and from a real failure.
+                </p>
+                <div class="check__buttons">
+                    <button class="action" data-error="not-found" type="button">Ask for /posts/0</button>
+                    <button class="action" data-error="abort" type="button">Cancel a request at once</button>
+                    <button class="action" data-error="timeout" type="button">Allow it 1 ms</button>
+                </div>
+                <ol class="log" id="errors-log"></ol>
+            </section>
+
+            <section class="check" id="cors" aria-labelledby="cors-title">
+                <h2 class="section-title" id="cors-title">Cross-origin requests</h2>
+                <p class="check__text">
+                    Each button sends one real request. Keep the Network filter on All to see the OPTIONS records.
+                </p>
+                <div class="check__buttons">
+                    <button class="action" data-cors="simple" type="button">Simple GET</button>
+                    <button class="action" data-cors="post" type="button">POST with JSON</button>
+                    <button class="action" data-cors="header" type="button">GET with X-Request-Id</button>
+                    <button class="action" data-cors="blocked" type="button">fetch example.com</button>
+                </div>
+                <ol class="log" id="cors-log"></ol>
+            </section>
+        </main>
+
+        <footer class="footer">
+            <p class="footer__text">
+                DrAnnotation is a charity project. We accept de-identified data only, and the datasets belong to the
+                community.
+            </p>
+            <p class="footer__text">API: <code id="api-url"></code>, <span id="app-mode"></span> mode</p>
+            <p class="footer__text">
+                <a class="footer__link" href="index.html">Catalogue</a>
+                <a class="footer__link" href="api.html">Publications</a>
+                Lab work 6, Polishchuk N., group PZ-2404
+            </p>
+        </footer>
+    </body>
+</html>

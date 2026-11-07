@@ -1,0 +1,19 @@
+.doctor {
+  margin-bottom: var(--gap);
+  padding-bottom: var(--gap);
+  border-bottom: var(--border) solid var(--color-line);
+
+  &__name {
+    margin: 0;
+    color: var(--color-heading);
+    font-family: var(--font-head);
+    font-size: var(--fs-m);
+    font-weight: 700;
+  }
+
+  &__role {
+    margin: 0;
+    color: var(--color-muted);
+    font-size: var(--fs-s);
+  }
+}

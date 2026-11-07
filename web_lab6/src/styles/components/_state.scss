@@ -1,0 +1,73 @@
+@use "../abstracts" as a;
+
+// Loading, error and empty result: only one of them is ever visible
+.state {
+  margin-top: var(--gap);
+  padding: var(--gap-l) var(--gap);
+  background: var(--color-surface);
+
+  &--error {
+    border-left: var(--rule) solid var(--color-danger);
+  }
+
+  &__title {
+    margin: 0 0 var(--gap-xs);
+    color: var(--color-heading);
+    font-family: var(--font-head);
+    font-size: var(--fs-m);
+    line-height: var(--line-height-head);
+  }
+
+  &__text {
+    margin: 0;
+    color: var(--color-muted);
+  }
+
+  &--error &__text {
+    color: var(--color-danger);
+    font-weight: 600;
+  }
+
+  &__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--gap-s);
+    margin-top: var(--gap);
+  }
+
+  // The loading indicator is an ECG trace being drawn: the catalogue holds ECG datasets
+  &__trace {
+    display: block;
+    width: var(--trace-width);
+    max-width: 100%;
+    height: auto;
+    margin-bottom: var(--gap-s);
+    overflow: visible;
+
+    path {
+      fill: none;
+      stroke: var(--color-red-strong);
+      stroke-width: 2;
+      stroke-linejoin: round;
+      stroke-dasharray: 0.35 0.65;
+      animation: sweep var(--sweep) linear infinite;
+    }
+  }
+}
+
+@keyframes sweep {
+  from {
+    stroke-dashoffset: 1;
+  }
+
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@include a.reduced-motion {
+  .state__trace path {
+    stroke-dasharray: none;
+    animation: none;
+  }
+}

@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta
+            name="description"
+            content="Own implementations of built-in JavaScript functions, checked with console.assert."
+        />
+        <title>DrAnnotation — language tasks</title>
+        <link rel="icon" href="assets/img/logo.svg" type="image/svg+xml" />
+        <link rel="stylesheet" href="styles/main.scss" />
+        <script type="module" src="js/tasks/main.ts"></script>
+    </head>
+    <body class="sheet">
+        <header class="header">
+            <a class="logo" href="index.html" aria-label="DrAnnotation catalogue">
+                <img class="logo__mark" src="assets/img/logo.svg" alt="" width="40" height="40" />
+                <span class="logo__name">Dr</span><span class="logo__word">Annotation</span>
+            </a>
+            <nav class="nav" aria-label="Main">
+                <ul class="nav__list">
+                    <li class="nav__item"><a class="nav__link" href="index.html">Catalogue</a></li>
+                    <li class="nav__item">
+                        <a class="nav__link nav__link--active" href="tasks.html" aria-current="page">Language tasks</a>
+                    </li>
+                    <li class="nav__item"><a class="nav__link" href="strict.html">Strict mode</a></li>
+                </ul>
+            </nav>
+        </header>
+
+        <main class="sheet__main">
+            <h1 class="content__title">Language tasks</h1>
+            <p class="content__lead">
+                Own versions of built-in functions, each compared with the original by <code>console.assert</code>. A
+                passing check prints nothing, so the totals are counted here.
+            </p>
+
+            <p class="sheet__summary" id="summary" role="status">Running the checks…</p>
+
+            <table class="table">
+                <caption class="table__caption">
+                    Checks per task
+                </caption>
+                <thead>
+                    <tr>
+                        <th class="table__head" scope="col">Task file</th>
+                        <th class="table__head" scope="col">Checks</th>
+                        <th class="table__head" scope="col">Failed</th>
+                    </tr>
+                </thead>
+                <tbody id="results"></tbody>
+            </table>
+        </main>
+
+        <footer class="footer">
+            <p class="footer__text">Open the console (F12) to see any failed check with its message.</p>
+            <p class="footer__text">Lab work 3, Polishchuk N., group PZ-2404</p>
+        </footer>
+    </body>
+</html>

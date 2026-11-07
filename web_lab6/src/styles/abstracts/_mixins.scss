@@ -1,0 +1,45 @@
+@use "variables" as v;
+
+// Mobile first: the rules inside apply from $width up
+@mixin respond-from($width) {
+  @media (min-width: $width) {
+    @content;
+  }
+}
+
+@mixin reduced-motion {
+  @media (prefers-reduced-motion: reduce) {
+    @content;
+  }
+}
+
+// Visible keyboard focus, the same on every control
+@mixin focus-ring {
+  outline: var(--focus-width) solid var(--color-focus);
+  outline-offset: var(--focus-offset);
+}
+
+@mixin list-reset {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+// A Sass map -> CSS custom properties: (bg: #fff) with prefix color -> --color-bg: #fff
+@mixin custom-properties($map, $prefix) {
+  @each $name, $value in $map {
+    --#{$prefix}-#{$name}: #{$value};
+  }
+}
+
+// The body of a page: .page (grid with a sidebar) and .sheet (one column)
+@mixin document {
+  margin: 0;
+  min-height: 100vh;
+  min-height: 100dvh;
+  background: var(--color-bg);
+  color: var(--color-ink);
+  font-family: var(--font-body);
+  font-size: var(--fs-base);
+  line-height: var(--line-height);
+}

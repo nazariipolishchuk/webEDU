@@ -1,0 +1,5 @@
+// The panels of the publications page are switched with the hidden attribute.
+// Classes such as .state set display, so the attribute needs !important to win.
+[hidden] {
+  display: none !important;
+}

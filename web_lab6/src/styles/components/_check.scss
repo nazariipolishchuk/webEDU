@@ -1,0 +1,22 @@
+// Network checks page
+.check {
+  margin-bottom: var(--gap-xl);
+
+  &__text {
+    max-width: var(--measure);
+    margin: 0 0 var(--gap);
+  }
+
+  &__buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--gap-s);
+  }
+
+  &__status {
+    min-height: 1.5em;
+    margin: var(--gap-s) 0 0;
+    color: var(--color-muted);
+    font-size: var(--fs-s);
+  }
+}

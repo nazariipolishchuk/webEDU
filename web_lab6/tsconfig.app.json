@@ -1,0 +1,35 @@
+{
+  // The application in src: it runs in the browser. tsc only checks the types, Vite writes the JavaScript.
+  "compilerOptions": {
+    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo",
+
+    /* Target platform */
+    "target": "ES2023",
+    "lib": ["ES2023", "ES2024.Object", "DOM"], // ES2024.Object: Object.groupBy of the lab 3 tasks
+    "types": ["vite/client"],
+
+    /* Modules */
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "verbatimModuleSyntax": true,
+    "isolatedModules": true,
+    "paths": { "@/*": ["./src/*"] },
+
+    /* Output: Vite writes the JavaScript */
+    "noEmit": true,
+    "allowImportingTsExtensions": true,
+
+    /* Strictness */
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "noImplicitOverride": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+
+    /* Compatibility and speed */
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true
+  },
+  "include": ["src"]
+}

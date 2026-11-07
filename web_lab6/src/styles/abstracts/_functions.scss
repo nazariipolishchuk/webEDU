@@ -1,0 +1,27 @@
+@use "sass:list";
+@use "sass:map";
+@use "sass:math";
+@use "variables" as v;
+
+// px of the design -> rem, so the text follows the font size chosen in the browser
+@function rem($px) {
+  @return math.div($px, 16) * 1rem;
+}
+
+// Font size by its name in $font-sizes: font-size("m") -> 1.25rem
+@function font-size($name) {
+  @if not map.has-key(v.$font-sizes, $name) {
+    @error "Unknown font size `#{$name}`, use one of #{map.keys(v.$font-sizes)}";
+  }
+  @return rem(map.get(v.$font-sizes, $name));
+}
+
+// One transition for several properties with the shared timing:
+// motion(opacity, transform) -> opacity var(--duration) var(--easing), transform var(--duration) var(--easing)
+@function motion($properties...) {
+  $list: ();
+  @each $property in $properties {
+    $list: list.append($list, $property var(--duration) var(--easing), $separator: comma);
+  }
+  @return $list;
+}

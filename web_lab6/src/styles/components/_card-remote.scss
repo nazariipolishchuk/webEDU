@@ -1,0 +1,23 @@
+// What a publication card adds to the dataset card of main.scss
+.card {
+  &__curator {
+    margin: 0 var(--gap);
+    padding-top: var(--gap-s);
+    border-top: var(--border) solid var(--color-line);
+    color: var(--color-ink);
+    font-size: var(--fs-s);
+  }
+
+  &__actions--single {
+    margin: 0 var(--gap);
+  }
+
+  // Three lines of text at most
+  &__clamp {
+    display: -webkit-box;
+    overflow: hidden;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
+  }
+}
