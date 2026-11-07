@@ -1,0 +1,38 @@
+@use "../abstracts" as a;
+
+// Page frame: on narrow screens every area stacks
+.page {
+  @include a.document;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: auto auto 1fr auto;
+  grid-template-areas:
+    "header"
+    "aside"
+    "main"
+    "footer";
+
+  // From 768px: the sidebar appears
+  @include a.respond-from(a.$bp-tablet) {
+    grid-template-columns: var(--aside-width) minmax(0, 1fr);
+    grid-template-rows: auto 1fr auto;
+    grid-template-areas:
+      "header header"
+      "aside  main"
+      "footer footer";
+  }
+
+  // From 1200px: the content width is capped. Masthead and footer still span
+  // the full width; side tracks are empty margins.
+  @include a.respond-from(a.$bp-desktop) {
+    grid-template-columns:
+      minmax(0, 1fr)
+      var(--aside-width)
+      minmax(0, calc(var(--content-max) - var(--aside-width)))
+      minmax(0, 1fr);
+    grid-template-areas:
+      "header header header header"
+      ".      aside  main   ."
+      "footer footer footer footer";
+  }
+}

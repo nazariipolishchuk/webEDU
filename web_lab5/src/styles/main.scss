@@ -1,0 +1,27 @@
+// main.scss: the stylesheet of every page. The partials go in the order of the cascade:
+// a later rule of the same weight wins, so .notice__undo has to follow .action.
+@use "base/root";
+@use "base/reset";
+@use "components/page";
+@use "components/header";
+@use "components/logo";
+@use "components/nav";
+@use "components/button";
+@use "components/sidebar";
+@use "components/doctor";
+@use "components/menu";
+@use "components/content";
+@use "components/section-title";
+@use "components/summary";
+@use "components/stat";
+@use "components/action";
+@use "components/form";
+@use "components/field";
+@use "components/notice";
+@use "components/toolbar";
+@use "components/catalog";
+@use "components/card";
+@use "components/footer";
+@use "components/sheet";
+@use "components/table";
+@use "components/trials";

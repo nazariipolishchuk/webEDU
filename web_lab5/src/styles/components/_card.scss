@@ -1,0 +1,190 @@
+@use "../abstracts" as a;
+
+// A dataset card. Hover lifts it: only transform and opacity are animated
+.card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-s);
+  padding-bottom: var(--gap);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+  transition: a.motion(transform);
+
+  &__image {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+    aspect-ratio: 8 / 5;
+    object-fit: cover;
+    border-bottom: var(--bar) solid var(--color-red);
+  }
+
+  &__status {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--gap-s);
+    margin: var(--gap-xs) var(--gap) 0;
+    color: var(--color-muted);
+    font-size: var(--fs-xs);
+    font-weight: 700;
+
+    &::before {
+      content: "";
+      width: var(--dot);
+      height: var(--dot);
+      background: var(--color-ready);
+    }
+
+    &--collecting::before {
+      background: var(--color-collecting);
+    }
+
+    &--review::before {
+      background: var(--color-review);
+    }
+  }
+
+  &__title {
+    margin: 0 var(--gap);
+    color: var(--color-heading);
+    font-family: var(--font-head);
+    font-size: var(--fs-m);
+    line-height: var(--line-height-head);
+  }
+
+  &__text {
+    flex: 1 1 auto;
+    margin: 0 var(--gap);
+    color: var(--color-muted);
+    font-size: var(--fs-s);
+  }
+
+  &__code {
+    margin: 0 var(--gap);
+    color: var(--color-muted);
+    font-size: var(--fs-xs);
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+  }
+
+  // The sum behind the value stays in sight: scans x price = value
+  &__ledger {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0 var(--gap-s);
+    margin: 0 var(--gap);
+    padding-top: var(--gap-s);
+    border-top: var(--border) solid var(--color-line);
+    font-variant-numeric: lining-nums tabular-nums;
+  }
+
+  &__sum {
+    color: var(--color-muted);
+    font-size: var(--fs-xs);
+  }
+
+  &__value {
+    color: var(--color-heading);
+    font-family: var(--font-head);
+    font-size: var(--fs-m);
+    line-height: var(--line-height-head);
+  }
+
+  &--selected {
+    outline: var(--bar) solid var(--color-ready);
+    outline-offset: calc(var(--bar) * -1);
+  }
+
+  &__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--gap-xs);
+    margin: 0 var(--gap);
+  }
+
+  &__toggle {
+    flex: 1 1 100%;
+    display: flex;
+    align-items: center;
+    gap: var(--gap-s);
+    text-align: left;
+
+    &::before {
+      content: "";
+      flex: none;
+      width: var(--dot);
+      height: var(--dot);
+      border: var(--border) solid currentColor;
+    }
+
+    &--on {
+      border-color: var(--color-ready);
+      color: var(--color-heading);
+      font-weight: 700;
+
+      &::before {
+        border-color: var(--color-ready);
+        background: var(--color-ready);
+      }
+    }
+  }
+
+  &__edit {
+    flex: 1 1 auto;
+  }
+
+  &__remove {
+    flex: 1 1 auto;
+    border-color: var(--color-danger);
+    color: var(--color-danger);
+  }
+
+  &__save,
+  &__cancel {
+    flex: 1 1 auto;
+  }
+
+  &__fields {
+    display: flex;
+    flex-direction: column;
+    margin: 0 var(--gap);
+  }
+
+  // The shadow sits on a layer above and only fades in
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    box-shadow: var(--shadow);
+    opacity: 0;
+    pointer-events: none;
+    transition: a.motion(opacity);
+  }
+
+  &:hover,
+  &:focus-within {
+    transform: translateY(var(--lift));
+  }
+
+  &:hover::after,
+  &:focus-within::after {
+    opacity: 1;
+  }
+
+  // Fields should not move under the pointer while a card is edited
+  &--editing:hover,
+  &--editing:focus-within {
+    transform: none;
+  }
+
+  @include a.reduced-motion {
+    &,
+    &::after {
+      transition: none;
+    }
+  }
+}

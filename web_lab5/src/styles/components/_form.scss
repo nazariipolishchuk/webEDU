@@ -1,0 +1,23 @@
+// Add form
+.editor {
+  margin-bottom: var(--gap-xl);
+}
+
+.form {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, var(--field-min)), 1fr));
+  gap: var(--gap-s) var(--gap);
+  padding: var(--gap);
+  background: var(--color-surface);
+
+  &__wide {
+    grid-column: 1 / -1;
+  }
+
+  &__actions {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--gap-s);
+  }
+}

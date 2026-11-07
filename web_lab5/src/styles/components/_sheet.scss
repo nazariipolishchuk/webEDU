@@ -1,0 +1,27 @@
+@use "../abstracts" as a;
+
+// Single-column pages: language tasks and strict mode
+.sheet {
+  @include a.document;
+  display: flex;
+  flex-direction: column;
+
+  &__main {
+    flex: 1 1 auto;
+    width: 100%;
+    max-width: var(--content-max);
+    margin-inline: auto;
+    padding: var(--gap-xl) var(--gap);
+  }
+
+  &__summary {
+    margin: 0 0 var(--gap-l);
+    padding: var(--gap);
+    border-left: var(--rule) solid var(--color-ready);
+    background: var(--color-surface);
+    color: var(--color-heading);
+    font-family: var(--font-head);
+    font-size: var(--fs-m);
+    font-weight: 700;
+  }
+}

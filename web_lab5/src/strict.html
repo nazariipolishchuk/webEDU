@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta name="description" content="The same code run with and without the use strict directive, side by side." />
+        <title>DrAnnotation — strict mode</title>
+        <link rel="icon" href="assets/img/logo.svg" type="image/svg+xml" />
+        <link rel="stylesheet" href="styles/main.scss" />
+        <script type="module" src="js/strict-on.js"></script>
+        <!-- A module is always strict, so the sloppy copy stays a classic script in public/.
+         vite-ignore: Vite copies it as it is and does not try to bundle it. -->
+        <script src="js/strict-off.js" defer vite-ignore></script>
+    </head>
+    <body class="sheet">
+        <header class="header">
+            <a class="logo" href="index.html" aria-label="DrAnnotation catalogue">
+                <img class="logo__mark" src="assets/img/logo.svg" alt="" width="40" height="40" />
+                <span class="logo__name">Dr</span><span class="logo__word">Annotation</span>
+            </a>
+            <nav class="nav" aria-label="Main">
+                <ul class="nav__list">
+                    <li class="nav__item"><a class="nav__link" href="index.html">Catalogue</a></li>
+                    <li class="nav__item"><a class="nav__link" href="tasks.html">Language tasks</a></li>
+                    <li class="nav__item">
+                        <a class="nav__link nav__link--active" href="strict.html" aria-current="page">Strict mode</a>
+                    </li>
+                </ul>
+            </nav>
+        </header>
+
+        <main class="sheet__main">
+            <h1 class="content__title">Strict and sloppy mode</h1>
+            <p class="content__lead">
+                Two scripts run the same code. Only the first starts with the <code>"use strict"</code> directive. Each
+                result is also printed to the console.
+            </p>
+
+            <div class="trials">
+                <section class="trials__column" aria-labelledby="strict-on-title">
+                    <h2 class="section-title" id="strict-on-title">With the directive</h2>
+                    <ol class="trials__list" id="strict-on"></ol>
+                </section>
+                <section class="trials__column" aria-labelledby="strict-off-title">
+                    <h2 class="section-title" id="strict-off-title">Without the directive</h2>
+                    <ol class="trials__list" id="strict-off"></ol>
+                </section>
+            </div>
+        </main>
+
+        <footer class="footer">
+            <p class="footer__text">The last five rows are parse errors, compiled at run time through new Function.</p>
+            <p class="footer__text">Lab work 3, Polishchuk N., group PZ-2404</p>
+        </footer>
+    </body>
+</html>

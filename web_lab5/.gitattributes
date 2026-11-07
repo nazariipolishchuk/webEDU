@@ -1,0 +1,3 @@
+# Prettier expects LF. Without this, Git for Windows (core.autocrlf=true)
+# checks the files out with CRLF and prettier --check reports every file.
+* text=auto eol=lf
