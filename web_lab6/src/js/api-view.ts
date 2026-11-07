@@ -1,7 +1,14 @@
-// js/api-view.js: turns data into DOM nodes and switches the interface states.
-import { scanImage } from "@/js/images.js";
-import { MODALITIES } from "./storage.js";
-import { createButton, createEl } from "./utils.js";
+// js/api-view.ts: turns data into DOM nodes and switches the interface states.
+import { scanImage } from "@/js/images.ts";
+import { MODALITIES } from "./storage.ts";
+import type { Comment, Curator, CuratorName, ListState, Modality, Post } from "./types.ts";
+import { createButton, createEl, element } from "./utils.ts";
+
+interface ScanType {
+  readonly key: Modality;
+  readonly code: string;
+  readonly label: string;
+}
 
 // One scan type per record, in the order of the lab 3 catalogue: records 1 to 8 get its codes
 const SCAN_TYPES = [
@@ -13,21 +20,42 @@ const SCAN_TYPES = [
   { key: "fundus", code: "RET", label: "Retina" },
   { key: "lung-ct", code: "LCT", label: "Lung CT" },
   { key: "bone-xray", code: "BXR", label: "Bone X-ray" },
+] as const satisfies readonly ScanType[];
+
+// The tuple has eight elements, so the index is inside it; the compiler cannot know that
+// about a computed index (noUncheckedIndexedAccess), hence the fallback to the first type.
+const scanTypeOf = (post: Post): ScanType =>
+  SCAN_TYPES[(post.id - 1) % SCAN_TYPES.length] ?? SCAN_TYPES[0];
+const codeOf = (post: Post) => `${scanTypeOf(post).code}-${1000 + post.id}`;
+const curatorName = (post: Post, users: Map<number, CuratorName>) =>
+  users.get(post.userId)?.name ?? `Curator ${post.userId}`;
+
+const list = element("#publication-list", HTMLUListElement);
+const panels = {
+  loading: element("#state-loading", HTMLElement),
+  error: element("#state-error", HTMLElement),
+  empty: element("#state-empty", HTMLElement),
+};
+const showMore = element("#show-more", HTMLButtonElement);
+const busyControls: (HTMLButtonElement | HTMLSelectElement)[] = [
+  element("#refresh", HTMLButtonElement),
+  showMore,
+  element("#filter-curator", HTMLSelectElement),
+  element("#server", HTMLSelectElement),
 ];
+const loadedCount = element("#loaded-count", HTMLElement);
+const loadingText = element("#loading-text", HTMLElement);
+const errorText = element("#error-text", HTMLElement);
+const showKept = element("#show-kept", HTMLButtonElement);
+const retryButton = element("#retry", HTMLButtonElement);
+const emptyTitle = element("#empty-title", HTMLElement);
+const allLoaded = element("#all-loaded", HTMLElement);
+const source = element("#source", HTMLElement);
+const curatorSelect = element("#filter-curator", HTMLSelectElement);
+const section = element("#publications", HTMLElement);
+let focusBack: HTMLElement | null = null; // a control that lost the keyboard focus by being switched off
 
-const scanTypeOf = (post) => SCAN_TYPES[(post.id - 1) % SCAN_TYPES.length];
-const codeOf = (post) => `${scanTypeOf(post).code}-${1000 + post.id}`;
-const curatorName = (post, users) => users.get(post.userId)?.name ?? `Curator ${post.userId}`;
-
-const $ = (selector) => document.querySelector(selector);
-
-const list = $("#publication-list");
-const panels = { loading: $("#state-loading"), error: $("#state-error"), empty: $("#state-empty") };
-const showMore = $("#show-more");
-const busyControls = [$("#refresh"), showMore, $("#filter-curator"), $("#server")];
-let focusBack = null; // a control that lost the keyboard focus by being switched off
-
-const createImage = (post) => {
+const createImage = (post: Post) => {
   const { key } = scanTypeOf(post);
   const image = createEl("img", "card__image");
   image.src = scanImage(key);
@@ -38,9 +66,9 @@ const createImage = (post) => {
   return image;
 };
 
-const createCard = (post, users) => {
+const createCard = (post: Post, users: Map<number, CuratorName>) => {
   const card = createEl("li", "card");
-  card.dataset.id = post.id;
+  card.dataset.id = String(post.id);
 
   const open = createButton("action card__open", "Open");
   open.setAttribute("aria-label", `Open ${post.title}`);
@@ -59,36 +87,66 @@ const createCard = (post, users) => {
   return card;
 };
 
-export const renderPosts = (posts, users) => {
+export const renderPosts = (posts: Post[], users: Map<number, CuratorName>): void => {
   list.replaceChildren(...posts.map((post) => createCard(post, users)));
-  $("#loaded-count").textContent = posts.length;
+  loadedCount.textContent = String(posts.length);
 };
 
-export const appendPosts = (posts, users, total) => {
+export const appendPosts = (
+  posts: Post[],
+  users: Map<number, CuratorName>,
+  total: number,
+): void => {
   list.append(...posts.map((post) => createCard(post, users)));
-  $("#loaded-count").textContent = total;
+  loadedCount.textContent = String(total);
 };
 
-export const focusCard = (id) => {
-  list.querySelector(`[data-id="${id}"] .card__open`)?.focus();
+export const focusCard = (id: number): void => {
+  list.querySelector<HTMLButtonElement>(`[data-id="${id}"] .card__open`)?.focus();
 };
 
-// state: loading | error | empty | success. Every change of state goes through this one function.
+// The texts of a state go to its panel. The switch covers every variant of ListState:
+// after "case" the compiler knows which fields the state has.
+const fillPanel = (state: ListState) => {
+  switch (state.status) {
+    case "loading":
+      loadingText.textContent = state.text;
+      break;
+    case "error":
+      errorText.textContent = state.message;
+      showKept.textContent = state.keptLabel;
+      showKept.hidden = state.keptLabel === "";
+      break;
+    case "empty":
+      emptyTitle.textContent = state.query
+        ? `No publications with “${state.query}” in the title`
+        : "No publications found";
+      break;
+    case "success":
+      break;
+    default: {
+      // A new state without its branch does not compile: never accepts no value
+      const unexpected: never = state;
+      throw new Error(`Unknown state ${JSON.stringify(unexpected)}`);
+    }
+  }
+};
+
+// Every change of state goes through this one function.
 // keepList: loading more or refreshing leaves the cards on the page, dimmed.
-export const showState = (state, { keepList = false } = {}) => {
-  for (const [name, panel] of Object.entries(panels)) panel.hidden = name !== state;
-  list.hidden = !(state === "success" || (state === "loading" && keepList));
-  list.setAttribute("aria-busy", String(state === "loading"));
-  $("#publications").dataset.state = state;
+export const showState = (state: ListState): void => {
+  fillPanel(state);
+  const keepList = state.status === "loading" && state.keepList;
+  for (const [name, panel] of Object.entries(panels)) panel.hidden = name !== state.status;
+  list.hidden = !(state.status === "success" || keepList);
+  list.setAttribute("aria-busy", String(state.status === "loading"));
+  section.dataset.state = state.status;
 
   // The search field stays on: typing during a request is what cancels that request
-  const busy = state === "loading";
-  if (
-    busy &&
-    busyControls.includes(document.activeElement) &&
-    document.activeElement !== showMore
-  ) {
-    focusBack = document.activeElement;
+  const busy = state.status === "loading";
+  const active = document.activeElement;
+  if (busy && active instanceof HTMLElement && active !== showMore) {
+    if (busyControls.some((control) => control === active)) focusBack = active;
   }
   busyControls.forEach((control) => {
     control.disabled = busy;
@@ -99,94 +157,83 @@ export const showState = (state, { keepList = false } = {}) => {
   }
 };
 
-export const setPaging = ({ hasMore, count }) => {
+// Retries change the text while the loading state stays
+export const setLoadingText = (text: string): void => {
+  loadingText.textContent = text;
+};
+
+export const setPaging = ({ hasMore, count }: { hasMore: boolean; count: number }): void => {
   showMore.hidden = !hasMore;
-  $("#all-loaded").hidden = hasMore || count === 0;
+  allLoaded.hidden = hasMore || count === 0;
 };
 
-export const hidePaging = () => setPaging({ hasMore: false, count: 0 });
+export const hidePaging = (): void => setPaging({ hasMore: false, count: 0 });
 
-export const setLoadingText = (text) => {
-  $("#loading-text").textContent = text;
+export const focusRetry = (): void => retryButton.focus();
+
+export const setSource = (text: string): void => {
+  source.textContent = text;
 };
 
-export const setError = (text, keptLabel = "") => {
-  $("#error-text").textContent = text;
-  $("#show-kept").textContent = keptLabel;
-  $("#show-kept").hidden = keptLabel === "";
-};
-
-export const focusRetry = () => $("#retry").focus();
-
-export const setEmpty = (query) => {
-  $("#empty-title").textContent = query
-    ? `No publications with “${query}” in the title`
-    : "No publications found";
-};
-
-export const setSource = (text) => {
-  $("#source").textContent = text;
-};
-
-export const fillCurators = (users, selected) => {
-  const select = $("#filter-curator");
-  select.replaceChildren(
+export const fillCurators = (users: Map<number, CuratorName>, selected: string): void => {
+  curatorSelect.replaceChildren(
     new Option("All curators", ""),
-    ...[...users.values()].map((user) => new Option(user.name, user.id)),
+    ...[...users.values()].map((user) => new Option(user.name, String(user.id))),
   );
-  select.value = selected;
+  curatorSelect.value = selected;
 };
 
 // ---------- The publication dialog ----------
 
-const dialog = $("#publication");
-const curatorBox = $("#curator-box");
-const commentsBox = $("#comments-box");
+const dialog = element("#publication", HTMLDialogElement);
+const curatorBox = element("#curator-box", HTMLElement);
+const commentsBox = element("#comments-box", HTMLElement);
 
-const boxLoading = (box, text) => {
+const boxLoading = (box: HTMLElement, text: string) => {
   box.replaceChildren(createEl("p", "box__message", text));
 };
 
-const boxError = (box, text, onRetry) => {
+const boxError = (box: HTMLElement, text: string, onRetry: () => void) => {
   const retry = createButton("action", "Retry");
   retry.addEventListener("click", onRetry);
   box.replaceChildren(createEl("p", "box__message box__message--error", text), retry);
 };
 
-const createFact = (name, value) => {
+const createFact = (name: string, value: string) => {
   const row = createEl("div", "facts__row");
   row.append(createEl("dt", "facts__name", name), createEl("dd", "facts__value", value));
   return row;
 };
 
-export const openPublication = (post) => {
-  $("#publication-type").textContent = scanTypeOf(post).label;
-  $("#publication-title").textContent = post.title;
-  $("#publication-code").textContent = codeOf(post);
-  $("#publication-body").textContent = post.body;
+export const openPublication = (post: Post): void => {
+  element("#publication-type", HTMLElement).textContent = scanTypeOf(post).label;
+  element("#publication-title", HTMLElement).textContent = post.title;
+  element("#publication-code", HTMLElement).textContent = codeOf(post);
+  element("#publication-body", HTMLElement).textContent = post.body;
   dialog.showModal();
 };
 
-export const closePublication = () => dialog.close();
+export const closePublication = (): void => dialog.close();
 
-export const detailsLoading = () => {
+export const detailsLoading = (): void => {
   boxLoading(curatorBox, "Loading the curator…");
   boxLoading(commentsBox, "Loading comments…");
 };
 
-export const renderCurator = ({ user, posts, albums }, onShowAll) => {
+// The optional parts of a user show a dash when the server leaves them out
+export const renderCurator = ({ user, posts, albums }: Curator, onShowAll: (() => void) | null) => {
   const facts = createEl("dl", "facts");
   facts.append(
     createFact("Username", user.username),
     createFact("Email", user.email),
-    createFact("City", user.address.city),
-    createFact("Company", user.company.name),
-    createFact("Website", user.website),
+    createFact("City", user.address?.city ?? "—"),
+    createFact("Company", user.company?.name ?? "—"),
+    createFact("Website", user.website ?? "—"),
     createFact("Publications", String(posts.length)),
     createFact("Albums", String(albums.length)),
   );
 
-  const nodes = [createEl("p", "curator__name", user.name), facts];
+  const nodes: HTMLElement[] = [createEl("p", "curator__name", user.name), facts];
   if (onShowAll) {
     const showAll = createButton("action", "Show this curator's publications");
     showAll.addEventListener("click", onShowAll);
@@ -195,7 +242,7 @@ export const renderCurator = ({ user, posts, albums }, onShowAll) => {
   curatorBox.replaceChildren(...nodes);
 };
 
-export const renderComments = (comments) => {
+export const renderComments = (comments: Comment[]): void => {
   if (comments.length === 0) {
     boxLoading(commentsBox, "No comments on this publication yet.");
     return;
@@ -215,5 +262,7 @@ export const renderComments = (comments) => {
   commentsBox.replaceChildren(items);
 };
 
-export const curatorError = (text, onRetry) => boxError(curatorBox, text, onRetry);
-export const commentsError = (text, onRetry) => boxError(commentsBox, text, onRetry);
+export const curatorError = (text: string, onRetry: () => void): void =>
+  boxError(curatorBox, text, onRetry);
+export const commentsError = (text: string, onRetry: () => void): void =>
+  boxError(commentsBox, text, onRetry);
