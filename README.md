@@ -9,6 +9,7 @@
 | ЛР 3   | lab03 | `web_lab3` | JavaScript: основи мови, DOM і події        |
 | ЛР 4   | lab04 | `web_lab4` | Асинхронний JavaScript, Fetch API, REST API |
 | ЛР 5   | lab05 | `web_lab5` | Node.js, npm, Git, Vite, Sass, PostCSS      |
+| ЛР 6   | lab06 | `web_lab6` | TypeScript: типи, інтерфейси, generic-типи  |
 
 ЛР 3 відкривається без сервера: `web_lab3/index.html` (каталог),
 `web_lab3/tasks.html` (власні реалізації), `web_lab3/strict.html` (строгий режим).
@@ -33,3 +34,14 @@ npm run preview      # перегляд dist/, http://localhost:4173
 npm run lint         # ESLint; npm run format – Prettier
 ```
 
+ЛР 6 – застосунок ЛР 5, переведений на TypeScript 6 у строгому режимі (варіант 2: `getJson<T>(url, guard)`
+повертає `Promise<Result<T, ApiError>>`, захисники типу для кожної відповіді API):
+
+```
+cd web_lab6
+npm install
+npm run dev          # сервер розробки, http://localhost:5173
+npm run typecheck    # tsc -b --noEmit: перевірка типів застосунку і vite.config.ts
+npm run build        # tsc -b && vite build, результат у dist/
+npm run lint         # ESLint з typescript-eslint (recommendedTypeChecked)
+```
