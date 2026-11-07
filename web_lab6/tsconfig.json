@@ -1,0 +1,5 @@
+{
+  // A solution file: it holds no files itself, tsc -b checks the two parts below
+  "files": [],
+  "references": [{ "path": "./tsconfig.app.json" }, { "path": "./tsconfig.node.json" }]
+}

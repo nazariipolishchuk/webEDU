@@ -4,7 +4,7 @@ import { defineConfig, loadEnv } from 'vite';
 const src = resolve(import.meta.dirname, 'src');
 
 // Every HTML page of the site is an entry point of the build
-const pages = ['index', 'api', 'network', 'tasks', 'strict'];
+const pages = ['index', 'api', 'network', 'tasks', 'strict'] as const;
 
 export default defineConfig(({ mode }) => {
   const isProd = mode === 'production';
@@ -51,8 +51,8 @@ export default defineConfig(({ mode }) => {
       rolldownOptions: {
         input: Object.fromEntries(pages.map((page) => [page, resolve(src, `${page}.html`)])),
         onwarn(warning, warn) {
-          // strict-on.js calls eval on purpose: it shows that strict mode keeps eval variables inside
-          if (warning.code === 'EVAL' && warning.id?.endsWith('strict-on.js')) return;
+          // strict-on.ts calls eval on purpose: it shows that strict mode keeps eval variables inside
+          if (warning.code === 'EVAL' && warning.id?.endsWith('strict-on.ts')) return;
           warn(warning);
         },
         // Content hashes in the names only in production, for long caching

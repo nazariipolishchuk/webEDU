@@ -1,0 +1,25 @@
+{
+  // vite.config.ts: it runs in Node.js, so no DOM, but the Node.js types
+  "compilerOptions": {
+    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.node.tsbuildinfo",
+
+    /* Target platform */
+    "target": "ES2023",
+    "lib": ["ES2023"],
+    "types": ["node"],
+
+    /* Modules */
+    "module": "NodeNext",
+    "verbatimModuleSyntax": true,
+
+    /* Output: Vite reads the config itself */
+    "noEmit": true,
+
+    /* Strictness */
+    "strict": true,
+
+    /* Compatibility and speed */
+    "skipLibCheck": true
+  },
+  "include": ["vite.config.ts"]
+}
